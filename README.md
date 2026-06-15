@@ -117,7 +117,7 @@ weighted toward machines / dumbbells / bodyweight that are easy to learn.
   - `.detail` = thin separation lines (pec split, ab grid, spine). `.hair` = the
     hair shape. `.ex-wrap` / `.player` = the inline video container (`.player.open`
     reveals it; the `iframe` is `aspect-ratio: 16/9`).
-- **Two `<svg>` figures** — `#svg-front` and `#svg-back`, `viewBox="0 0 240 560"`.
+- **Two `<svg>` figures** — `#svg-front` and `#svg-back`, `viewBox="0 0 300 560"`.
   Clickable parts have `class="muscle"` and a `data-group="..."` attribute.
   Non-interactive body outline parts use `class="body-base"` (or `class="hair"`).
   Thin `class="detail"` paths add muscle separation lines. The SVGs are stylized
@@ -168,8 +168,8 @@ Rendering, the embed, and the fallback link are all automatic.
 3. Add the `<id>` to `CHIP_ORDER`.
 
 ### To edit the body figure
-Both SVGs share the same hand-authored coordinate system (`viewBox 0 0 240 560`,
-centered on x=120). The base silhouette (`body-base` / `hair`) is drawn first,
+Both SVGs share the same hand-authored coordinate system (`viewBox 0 0 300 560`,
+centered on x=150). The base silhouette (`body-base` / `hair`) is drawn first,
 then `muscle` regions overlay it, then thin `detail` lines on top. If you reshape
 the silhouette, move the overlapping `muscle` paths to match. Verify visually at
 both desktop and mobile widths (the mobile height cap changes how it reads).

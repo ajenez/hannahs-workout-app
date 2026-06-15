@@ -10,16 +10,18 @@
     --bg-soft: #1a212b;
     --card: #1e2733;
     --card-hover: #26313f;
+    --line: #2a3543;
     --accent: #ff5a5f;
-    --accent-soft: #ff5a5f33;
-    --accent-2: #4dd0e1;
+    --accent-soft: #ff5a5f22;
+    --good: #4dd0e1;
+    --beg: #57d9a3;
+    --beg-soft: #57d9a31f;
+    --int: #ffb454;
+    --int-soft: #ffb4541f;
+    --warn: #ff7a6b;
     --text: #eef2f6;
     --text-dim: #9aa7b4;
-    --muscle: #3a4757;
-    --muscle-hover: #ff8a8d;
-    --muscle-active: #ff5a5f;
     --radius: 16px;
-    --shadow: 0 10px 30px rgba(0,0,0,0.35);
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -30,618 +32,942 @@
     background: radial-gradient(1200px 600px at 50% -10%, #1d2733 0%, var(--bg) 60%);
     color: var(--text);
     min-height: 100vh;
+    padding-bottom: 78px;
     -webkit-font-smoothing: antialiased;
   }
 
   header {
     text-align: center;
-    padding: 26px 16px 8px;
+    padding: 22px 16px 10px;
   }
-  header h1 {
-    margin: 0;
-    font-size: 1.7rem;
-    letter-spacing: -0.5px;
-  }
+  header h1 { margin: 0; font-size: 1.55rem; letter-spacing: -0.5px; }
   header h1 .accent { color: var(--accent); }
-  header p {
-    margin: 6px 0 0;
-    color: var(--text-dim);
-    font-size: 0.92rem;
-  }
+  header p { margin: 5px 0 0; color: var(--text-dim); font-size: 0.88rem; }
 
-  .wrap {
-    max-width: 920px;
-    margin: 0 auto;
-    padding: 16px;
-    display: grid;
-    grid-template-columns: minmax(280px, 1fr) minmax(300px, 1.05fr);
-    gap: 20px;
-    align-items: start;
-  }
+  main { max-width: 640px; margin: 0 auto; padding: 0 14px; }
 
-  @media (max-width: 760px) {
-    .wrap { grid-template-columns: 1fr; gap: 14px; padding: 12px; }
-    header { padding: 18px 16px 6px; }
-    /* Cap the figure height so the quick-pick chips and results stay within
-       reach on a phone instead of being a full screen-scroll below the figure. */
-    svg.body.on { height: 46vh; width: auto; max-width: 100%; margin: 0 auto; }
-  }
+  .view { display: none; }
+  .view.on { display: block; }
+  .view-title { font-size: 1.2rem; margin: 8px 0 4px; }
+  .view-sub { color: var(--text-dim); font-size: 0.86rem; margin: 0 0 16px; }
 
-  .panel {
+  /* ---- Equipment filter ---- */
+  .filterbar {
     background: var(--bg-soft);
-    border: 1px solid #2a3543;
-    border-radius: var(--radius);
-    padding: 16px;
-    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 12px 14px;
+    margin: 6px 0 18px;
   }
+  .filter-h {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--text-dim); margin-bottom: 9px;
+  }
+  .equip-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .equip-chips button {
+    border: 1px solid #33414f; background: var(--card);
+    color: var(--text-dim); padding: 6px 12px; border-radius: 999px;
+    font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.15s;
+  }
+  .equip-chips button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
 
-  /* View toggle */
-  .toggle {
-    display: flex;
-    gap: 6px;
+  /* ---- Muscle chips by region ---- */
+  .region-h {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--text-dim); margin: 16px 0 8px;
+  }
+  .muscle-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .muscle-chips button {
+    border: 1px solid #33414f; background: var(--card);
+    color: var(--text); padding: 8px 14px; border-radius: 999px;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.15s;
+  }
+  .muscle-chips button:hover { border-color: var(--accent); }
+  .muscle-chips button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ---- Results ---- */
+  #ex-results { margin-top: 22px; }
+  .placeholder, .empty {
+    color: var(--text-dim); text-align: center; font-size: 0.9rem;
+    padding: 34px 12px; border: 1px dashed var(--line); border-radius: 14px;
+  }
+  .res-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+  .res-head h2 { margin: 0; font-size: 1.3rem; }
+  .res-head .count { color: var(--text-dim); font-size: 0.82rem; }
+
+  /* ---- Exercise card ---- */
+  .ex-wrap { margin-bottom: 14px; }
+  .card {
     background: var(--card);
-    padding: 5px;
-    border-radius: 999px;
-    width: fit-content;
-    margin: 0 auto 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 15px 16px;
   }
-  .toggle button {
-    border: none;
-    background: transparent;
-    color: var(--text-dim);
-    padding: 8px 22px;
-    border-radius: 999px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.18s;
+  .card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+  .card-name { font-weight: 700; font-size: 1.04rem; flex: 1; }
+  .lvl {
+    flex: none; font-size: 0.66rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 3px 9px; border-radius: 999px;
   }
-  .toggle button.on {
-    background: var(--accent);
-    color: #fff;
-  }
+  .lvl.beg { color: var(--beg); background: var(--beg-soft); }
+  .lvl.int { color: var(--int); background: var(--int-soft); }
+  .card-desc { color: var(--text-dim); font-size: 0.86rem; line-height: 1.45; }
 
-  .figure-stage { position: relative; }
-  svg.body { width: 100%; height: auto; display: none; }
-  svg.body.on { display: block; }
+  .srr {
+    display: flex; margin: 12px 0;
+    background: var(--bg-soft); border-radius: 10px; overflow: hidden;
+  }
+  .srr > div {
+    flex: 1; text-align: center; padding: 9px 4px;
+    border-right: 1px solid var(--line);
+  }
+  .srr > div:last-child { border-right: none; }
+  .srr b { display: block; font-size: 1.05rem; font-weight: 700; }
+  .srr span { display: block; font-size: 0.66rem; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-dim); margin-top: 2px; }
 
-  .muscle {
-    fill: var(--muscle);
-    stroke: #0f1419;
-    stroke-width: 1.2;
-    cursor: pointer;
-    transition: fill 0.15s ease;
+  .block { margin: 11px 0; }
+  .block-h {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-dim); margin-bottom: 5px;
   }
-  .muscle:hover { fill: var(--muscle-hover); }
-  .muscle.selected { fill: var(--muscle-active); }
-  .body-base {
-    fill: #2a3441;
-    stroke: #0f1419;
-    stroke-width: 1.2;
-    stroke-linejoin: round;
+  .block-h.warn { color: var(--warn); }
+  .cues, .mistakes { margin: 0; padding-left: 0; list-style: none; }
+  .cues li, .mistakes li {
+    font-size: 0.85rem; line-height: 1.45; padding: 2px 0 2px 16px; position: relative;
   }
-  .muscle { stroke-linejoin: round; }
-  /* thin separation lines (pec split, ab grid, spine) for a more anatomical look */
-  .detail {
-    fill: none;
-    stroke: #0f1419;
-    stroke-width: 1.3;
-    stroke-linecap: round;
-    opacity: 0.4;
-    pointer-events: none;
-  }
-  .hair {
-    fill: #232d39;
-    stroke: #0f1419;
-    stroke-width: 1.2;
-    stroke-linejoin: round;
-  }
+  .cues li::before { content: "›"; position: absolute; left: 2px; color: var(--accent); font-weight: 700; }
+  .mistakes li { color: #d7b4ae; }
+  .mistakes li::before { content: "✕"; position: absolute; left: 2px; color: var(--warn); font-size: 0.72rem; top: 4px; }
 
-  .hint {
-    text-align: center;
-    color: var(--text-dim);
-    font-size: 0.82rem;
-    margin-top: 6px;
+  .pills { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0 4px; }
+  .pill {
+    font-size: 0.76rem; color: var(--text-dim);
+    background: var(--bg-soft); border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 11px;
   }
+  .pill .pill-k { color: var(--text); font-weight: 600; }
 
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    justify-content: center;
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid #2a3543;
+  .actions { display: flex; gap: 8px; margin-top: 12px; }
+  .watch {
+    flex: 1; font-family: inherit; border: none; cursor: pointer;
+    background: var(--accent); color: #fff; font-weight: 700; font-size: 0.85rem;
+    padding: 10px; border-radius: 10px;
   }
-  .chips button {
-    border: 1px solid #33414f;
-    background: var(--card);
-    color: var(--text-dim);
-    padding: 7px 12px;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.15s;
+  .watch:active { transform: scale(0.98); }
+  .save {
+    flex: none; font-family: inherit; cursor: pointer;
+    background: transparent; border: 1px solid #33414f; color: var(--text-dim);
+    font-weight: 600; font-size: 0.85rem; padding: 10px 14px; border-radius: 10px;
   }
-  .chips button:hover { color: var(--text); border-color: var(--accent); }
-  .chips button.on {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
+  .save.on { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .save:active { transform: scale(0.98); }
 
-  /* Results panel */
-  #results .placeholder {
-    color: var(--text-dim);
-    text-align: center;
-    padding: 40px 10px;
-  }
-  #results .placeholder .big { font-size: 2.2rem; margin-bottom: 8px; }
-
-  .group-head {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 4px;
-  }
-  .group-head h2 {
-    margin: 0;
-    font-size: 1.3rem;
-  }
-  .group-head .dot {
-    width: 12px; height: 12px; border-radius: 50%;
-    background: var(--accent);
-    flex: none;
-  }
-  .group-sub {
-    color: var(--text-dim);
-    font-size: 0.86rem;
-    margin: 0 0 14px;
-  }
-
-  .ex-wrap { margin-bottom: 10px; }
-  .ex {
-    background: var(--card);
-    border: 1px solid #2a3543;
-    border-radius: 12px;
-    padding: 12px 14px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: 0.15s;
-  }
-  .ex:hover { background: var(--card-hover); }
-  .ex .info { flex: 1; min-width: 0; }
-  .ex .name { font-weight: 600; font-size: 0.98rem; }
-  .ex .desc { color: var(--text-dim); font-size: 0.82rem; margin-top: 2px; }
-  .ex .badge {
-    display: inline-block;
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--accent-2);
-    border: 1px solid #2f4a50;
-    border-radius: 999px;
-    padding: 2px 8px;
-    margin-top: 6px;
-  }
-  .ex .watch {
-    flex: none;
-    font-family: inherit;
-    border: none;
-    cursor: pointer;
-    background: var(--accent);
-    color: #fff;
-    font-weight: 600;
-    font-size: 0.8rem;
-    padding: 9px 14px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-  }
-  .ex .watch:active { transform: scale(0.96); }
-  .ex .watch.on { background: var(--card-hover); color: var(--text); }
-
-  /* inline video embed (expands under the exercise on tap) */
+  /* inline video */
   .player { display: none; margin-top: 8px; }
   .player.open { display: block; }
   .player iframe {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border: 0;
-    border-radius: 12px;
-    display: block;
-    background: #000;
+    width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 12px;
+    display: block; background: #000;
   }
   .player .fallback {
-    display: inline-block;
-    margin-top: 6px;
-    font-size: 0.74rem;
-    color: var(--text-dim);
-    text-decoration: none;
+    display: inline-block; margin-top: 6px; font-size: 0.74rem;
+    color: var(--text-dim); text-decoration: none;
   }
   .player .fallback:hover { color: var(--text); }
 
-  footer {
-    text-align: center;
-    color: var(--text-dim);
-    font-size: 0.78rem;
-    padding: 10px 16px 30px;
+  /* ---- Routines ---- */
+  .routine { border: 1px solid var(--line); border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
+  .routine-head {
+    width: 100%; text-align: left; background: var(--card); border: none; cursor: pointer;
+    color: var(--text); padding: 15px 16px; display: flex; align-items: center; gap: 10px;
+    font-family: inherit; border-left: 3px solid var(--accent);
   }
+  .routine-head > div { flex: 1; }
+  .routine-name { font-weight: 700; font-size: 1rem; }
+  .routine-meta { color: var(--text-dim); font-size: 0.8rem; margin-top: 2px; }
+  .chev { color: var(--text-dim); font-size: 0.9rem; }
+  .routine-body { display: none; padding: 4px 14px 14px; }
+  .routine-body.open { display: block; }
+  .routine-note { color: var(--text-dim); font-size: 0.84rem; line-height: 1.5; margin: 10px 2px 12px; }
+  .day-h {
+    font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--good); margin: 14px 0 8px;
+  }
+  .rrow {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .rrow-main { flex: 1; min-width: 0; }
+  .rrow-name { font-weight: 600; font-size: 0.92rem; display: block; }
+  .rrow-meta { color: var(--text-dim); font-size: 0.78rem; }
+  .rwatch {
+    flex: none; font-family: inherit; border: none; cursor: pointer;
+    background: var(--accent-soft); color: var(--accent); font-weight: 700;
+    font-size: 0.85rem; padding: 8px 13px; border-radius: 9px;
+  }
+  .rrow .player { flex-basis: 100%; }
+
+  /* ---- Tips ---- */
+  .tip {
+    background: var(--card); border: 1px solid var(--line);
+    border-left: 3px solid var(--good); border-radius: 12px;
+    padding: 13px 15px; margin-bottom: 10px;
+    font-size: 0.9rem; line-height: 1.5;
+  }
+
+  .banner {
+    background: var(--int-soft); border: 1px solid var(--int);
+    color: #f0d6ad; border-radius: 12px; padding: 12px 14px;
+    font-size: 0.84rem; line-height: 1.45; margin-bottom: 14px;
+  }
+
+  /* ---- Bottom tab bar ---- */
+  .tabbar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; background: rgba(18,24,31,0.96);
+    border-top: 1px solid var(--line); backdrop-filter: blur(8px);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    z-index: 50;
+  }
+  .tabbar button {
+    flex: 1; background: none; border: none; cursor: pointer; font-family: inherit;
+    color: var(--text-dim); padding: 7px 2px; border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  .tabbar button .ico { font-size: 1.15rem; line-height: 1; }
+  .tabbar button .lab { font-size: 0.66rem; font-weight: 600; }
+  .tabbar button.on { color: var(--accent); }
+
+  footer { text-align: center; color: var(--text-dim); font-size: 0.74rem; padding: 22px 16px 8px; }
 </style>
 </head>
 <body>
   <header>
     <h1>Workout <span class="accent">Finder</span></h1>
-    <p>Tap a muscle group on the body to see exercises that train it.</p>
+    <p>Pick a muscle group and get exercises you can do with confidence.</p>
   </header>
 
-  <div class="wrap">
-    <!-- LEFT: body diagram -->
-    <div class="panel">
-      <div class="toggle">
-        <button id="btn-front" class="on" onclick="setView('front')">Front</button>
-        <button id="btn-back" onclick="setView('back')">Back</button>
+  <main>
+    <!-- EXERCISES -->
+    <section id="view-exercises" class="view on">
+      <div class="filterbar">
+        <div class="filter-h">Equipment available</div>
+        <div class="equip-chips" id="equip-chips"></div>
       </div>
-
-      <div class="figure-stage">
-        <!-- FRONT -->
-        <svg class="body on" id="svg-front" viewBox="0 0 300 560" xmlns="http://www.w3.org/2000/svg">
-          <!-- base body silhouette (female) -->
-          <g class="base">
-            <!-- hair -->
-            <path class="hair" d="M120,16 C98,16 80,34 80,62 C80,80 82,92 88,102 C92,98 94,84 94,64 C100,58 110,56 120,56 C130,56 140,58 146,64 C146,84 148,98 152,102 C158,92 160,80 160,62 C160,34 142,16 120,16 Z"/>
-            <!-- head -->
-            <ellipse class="body-base" cx="120" cy="46" rx="17" ry="22"/>
-            <!-- neck -->
-            <path class="body-base" d="M110,64 L130,64 L132,90 L108,90 Z"/>
-            <!-- torso (fuller, average build) -->
-            <path class="body-base" d="M108,90 C92,92 80,98 74,110 C70,130 72,148 80,164 C86,182 90,196 96,206 C99,212 100,214 98,222 C96,238 90,250 84,264 C80,274 80,284 90,290 C104,296 136,296 150,290 C160,284 160,274 156,264 C150,250 144,238 142,222 C140,214 141,212 144,206 C150,196 154,182 160,164 C168,148 170,130 166,110 C160,98 148,92 132,90 Z"/>
-            <!-- arms -->
-            <path class="body-base" d="M76,110 C62,116 54,150 52,198 C50,234 48,264 50,290 C50,304 58,310 64,310 C70,310 73,302 73,290 C75,250 78,220 82,196 C86,158 88,128 90,116 Z"/>
-            <path class="body-base" d="M164,110 C178,116 186,150 188,198 C190,234 192,264 190,290 C190,304 182,310 176,310 C170,310 167,302 167,290 C165,250 162,220 158,196 C154,158 152,128 150,116 Z"/>
-            <!-- legs -->
-            <path class="body-base" d="M84,268 C78,274 76,286 78,302 C80,344 82,382 90,412 C90,440 92,474 96,512 C97,524 107,524 108,512 C112,472 112,442 112,412 C114,382 116,332 118,300 C119,290 120,286 120,282 C120,286 121,290 122,300 C124,332 126,382 128,412 C128,442 128,474 132,512 C133,524 141,524 142,512 C146,474 148,442 148,412 C154,382 156,340 158,300 C160,286 158,276 152,272 Z"/>
-            <!-- feet -->
-            <ellipse class="body-base" cx="103" cy="522" rx="12" ry="7"/>
-            <ellipse class="body-base" cx="137" cy="522" rx="12" ry="7"/>
-          </g>
-
-          <!-- shoulders / delts -->
-          <path class="muscle" data-group="shoulders" d="M76,110 C64,112 58,130 62,150 C76,154 88,146 92,124 C90,114 84,110 76,110 Z"/>
-          <path class="muscle" data-group="shoulders" d="M164,110 C176,112 182,130 178,150 C164,154 152,146 148,124 C150,114 156,110 164,110 Z"/>
-          <!-- chest / pecs -->
-          <path class="muscle" data-group="chest" d="M118,118 C102,114 86,118 82,132 C80,148 92,158 110,158 C118,156 119,142 118,130 Z"/>
-          <path class="muscle" data-group="chest" d="M122,118 C138,114 154,118 158,132 C160,148 148,158 130,158 C122,156 121,142 122,130 Z"/>
-          <!-- biceps -->
-          <path class="muscle" data-group="biceps" d="M72,150 C62,168 62,194 70,206 C80,206 86,194 86,174 C86,160 80,150 72,150 Z"/>
-          <path class="muscle" data-group="biceps" d="M168,150 C178,168 178,194 170,206 C160,206 154,194 154,174 C154,160 160,150 168,150 Z"/>
-          <!-- forearms -->
-          <path class="muscle" data-group="forearms" d="M66,212 C56,236 54,266 60,292 C70,294 78,286 78,266 C78,242 74,224 74,214 Z"/>
-          <path class="muscle" data-group="forearms" d="M174,212 C184,236 186,266 180,292 C170,294 162,286 162,266 C162,242 166,224 166,214 Z"/>
-          <!-- abs / core -->
-          <path class="muscle" data-group="core" d="M102,158 C96,176 96,198 102,212 C104,224 100,238 108,250 C116,256 124,256 132,250 C140,238 136,224 138,212 C144,198 144,176 138,158 C128,154 112,154 102,158 Z"/>
-          <!-- quads -->
-          <path class="muscle" data-group="quads" d="M84,300 C74,340 80,382 92,406 C100,408 106,404 106,360 C106,330 104,304 100,290 C96,286 92,286 88,290 Z"/>
-          <path class="muscle" data-group="quads" d="M156,302 C166,340 160,382 148,406 C140,408 134,404 134,360 C134,332 138,310 142,300 C146,296 150,296 154,300 Z"/>
-          <!-- separation detail -->
-          <path class="detail" d="M120,118 L120,158"/>
-          <path class="detail" d="M88,150 C100,168 113,170 120,165"/>
-          <path class="detail" d="M152,150 C140,168 127,170 120,165"/>
-          <path class="detail" d="M120,160 L120,248"/>
-          <path class="detail" d="M108,182 L132,182 M108,202 L132,202 M108,222 L132,222"/>
-        </svg>
-
-        <!-- BACK -->
-        <svg class="body" id="svg-back" viewBox="0 0 300 560" xmlns="http://www.w3.org/2000/svg">
-          <g class="base">
-            <!-- hair -->
-            <path class="hair" d="M120,16 C98,16 80,34 80,62 C80,80 82,92 88,102 C92,98 94,84 94,64 C100,58 110,56 120,56 C130,56 140,58 146,64 C146,84 148,98 152,102 C158,92 160,80 160,62 C160,34 142,16 120,16 Z"/>
-            <!-- head -->
-            <ellipse class="body-base" cx="120" cy="46" rx="17" ry="22"/>
-            <!-- neck -->
-            <path class="body-base" d="M110,64 L130,64 L132,90 L108,90 Z"/>
-            <!-- torso (fuller, average build) -->
-            <path class="body-base" d="M108,90 C92,92 80,98 74,110 C70,130 72,148 80,164 C86,182 90,196 96,206 C99,212 100,214 98,222 C96,238 90,250 84,264 C80,274 80,284 90,290 C104,296 136,296 150,290 C160,284 160,274 156,264 C150,250 144,238 142,222 C140,214 141,212 144,206 C150,196 154,182 160,164 C168,148 170,130 166,110 C160,98 148,92 132,90 Z"/>
-            <!-- arms -->
-            <path class="body-base" d="M76,110 C62,116 54,150 52,198 C50,234 48,264 50,290 C50,304 58,310 64,310 C70,310 73,302 73,290 C75,250 78,220 82,196 C86,158 88,128 90,116 Z"/>
-            <path class="body-base" d="M164,110 C178,116 186,150 188,198 C190,234 192,264 190,290 C190,304 182,310 176,310 C170,310 167,302 167,290 C165,250 162,220 158,196 C154,158 152,128 150,116 Z"/>
-            <!-- legs -->
-            <path class="body-base" d="M84,268 C78,274 76,286 78,302 C80,344 82,382 90,412 C90,440 92,474 96,512 C97,524 107,524 108,512 C112,472 112,442 112,412 C114,382 116,332 118,300 C119,290 120,286 120,282 C120,286 121,290 122,300 C124,332 126,382 128,412 C128,442 128,474 132,512 C133,524 141,524 142,512 C146,474 148,442 148,412 C154,382 156,340 158,300 C160,286 158,276 152,272 Z"/>
-            <!-- feet -->
-            <ellipse class="body-base" cx="103" cy="522" rx="12" ry="7"/>
-            <ellipse class="body-base" cx="137" cy="522" rx="12" ry="7"/>
-          </g>
-
-          <!-- traps -->
-          <path class="muscle" data-group="traps" d="M120,92 C100,94 84,104 76,116 C96,128 104,150 120,168 C136,150 144,128 164,116 C156,104 140,94 120,92 Z"/>
-          <!-- rear delts -->
-          <path class="muscle" data-group="shoulders" d="M76,110 C64,112 58,130 62,150 C76,154 88,146 92,124 C90,114 84,110 76,110 Z"/>
-          <path class="muscle" data-group="shoulders" d="M164,110 C176,112 182,130 178,150 C164,154 152,146 148,124 C150,114 156,110 164,110 Z"/>
-          <!-- back / lats -->
-          <path class="muscle" data-group="back" d="M88,120 C76,148 76,184 96,212 C106,216 114,210 114,194 C112,162 106,140 104,124 Z"/>
-          <path class="muscle" data-group="back" d="M152,120 C164,148 164,184 144,212 C134,216 126,210 126,194 C128,162 134,140 136,124 Z"/>
-          <!-- triceps -->
-          <path class="muscle" data-group="triceps" d="
-          <g class="base">
-            <!-- hair -->
-            <path class="hair" d="M120,16 C98,16 80,34 80,62 C80,80 82,92 88,102 C92,98 94,84 94,64 C100,58 110,56 120,56 C130,56 140,58 146,64 C146,84 148,98 152,102 C158,92 160,80 160,62 C160,34 142,16 120,16 Z"/>
-            <!-- head -->
-            <ellipse class="body-base" cx="120" cy="46" rx="17" ry="22"/>
-            <!-- neck -->
-            <path class="body-base" d="M110,64 L130,64 L132,90 L108,90 Z"/>
-            <!-- torso (fuller, average build) -->
-            <path class="body-base" d="M108,90 C92,92 80,98 74,110 C70,130 72,148 80,164 C86,182 90,196 96,206 C99,212 100,214 98,222 C96,238 90,250 84,264 C80,274 80,284 90,290 C104,296 136,296 150,290 C160,284 160,274 156,264 C150,250 144,238 142,222 C140,214 141,212 144,206 C150,196 154,182 160,164 C168,148 170,130 166,110 C160,98 148,92 132,90 Z"/>
-            <!-- arms -->
-            <path class="body-base" d="M76,110 C62,116 54,150 52,198 C50,234 48,264 50,290 C50,304 58,310 64,310 C70,310 73,302 73,290 C75,250 78,220 82,196 C86,158 88,128 90,116 Z"/>
-            <path class="body-base" d="M164,110 C178,116 186,150 188,198 C190,234 192,264 190,290 C190,304 182,310 176,310 C170,310 167,302 167,290 C165,250 162,220 158,196 C154,158 152,128 150,116 Z"/>
-            <!-- legs -->
-            <path class="body-base" d="M84,268 C78,274 76,286 78,302 C80,344 82,382 90,412 C90,440 92,474 96,512 C97,524 107,524 108,512 C112,472 112,442 112,412 C114,382 116,332 118,300 C119,290 120,286 120,282 C120,286 121,290 122,300 C124,332 126,382 128,412 C128,442 128,474 132,512 C133,524 141,524 142,512 C146,474 148,442 148,412 C154,382 156,340 158,300 C160,286 158,276 152,272 Z"/>
-            <!-- feet -->
-            <ellipse class="body-base" cx="103" cy="522" rx="12" ry="7"/>
-            <ellipse class="body-base" cx="137" cy="522" rx="12" ry="7"/>
-          </g>
-
-          <!-- traps -->
-          <path class="muscle" data-group="traps" d="M120,92 C100,94 84,104 76,116 C96,128 104,150 120,168 C136,150 144,128 164,116 C156,104 140,94 120,92 Z"/>
-          <!-- rear delts -->
-          <path class="muscle" data-group="shoulders" d="M76,110 C64,112 58,130 62,150 C76,154 88,146 92,124 C90,114 84,110 76,110 Z"/>
-          <path class="muscle" data-group="shoulders" d="M164,110 C176,112 182,130 178,150 C164,154 152,146 148,124 C150,114 156,110 164,110 Z"/>
-          <!-- back / lats -->
-          <path class="muscle" data-group="back" d="M88,120 C76,148 76,184 96,212 C106,216 114,210 114,194 C112,162 106,140 104,124 Z"/>
-          <path class="muscle" data-group="back" d="M152,120 C164,148 164,184 144,212 C134,216 126,210 126,194 C128,162 134,140 136,124 Z"/>
-          <!-- triceps -->
-          <path class="muscle" data-group="triceps" d="M72,150 C62,168 62,194 70,206 C80,206 86,194 86,174 C86,160 80,150 72,150 Z"/>
-          <path class="muscle" data-group="triceps" d="M168,150 C178,168 178,194 170,206 C160,206 154,194 154,174 C154,160 160,150 168,150 Z"/>
-          <!-- forearms -->
-          <path class="muscle" data-group="forearms" d="M66,212 C56,236 54,266 60,292 C70,294 78,286 78,266 C78,242 74,224 74,214 Z"/>
-          <path class="muscle" data-group="forearms" d="M174,212 C184,236 186,266 180,292 C170,294 162,286 162,266 C162,242 166,224 166,214 Z"/>
-          <!-- lower back -->
-          <path class="muscle" data-group="lowerback" d="M104,214 C102,228 102,244 108,256 C116,262 124,262 132,256 C138,244 138,228 136,214 C126,210 114,210 104,214 Z"/>
-          <!-- glutes -->
-          <path class="muscle" data-group="glutes" d="M96,256 C88,258 86,278 88,302 C94,318 106,322 115,310 C119,300 119,278 115,264 C111,258 102,256 96,256 Z"/>
-          <path class="muscle" data-group="glutes" d="M144,256 C152,258 154,278 152,302 C146,318 134,322 125,310 C121,300 121,278 125,264 C129,258 138,256 144,256 Z"/>
-          <!-- hamstrings -->
-          <path class="muscle" data-group="hamstrings" d="M86,314 C80,352 84,386 92,408 C100,410 106,406 106,372 C106,348 104,326 100,316 C96,312 92,312 88,316 Z"/>
-          <path class="muscle" data-group="hamstrings" d="M154,314 C160,352 156,386 148,408 C140,410 134,406 134,372 C134,348 136,326 140,316 C144,312 148,312 152,316 Z"/>
-          <!-- calves -->
-          <path class="muscle" data-group="calves" d="M90,418 C84,448 86,486 96,510 C99,516 105,514 106,504 C110,478 108,448 102,420 C98,416 92,416 90,418 Z"/>
-          <path class="muscle" data-group="calves" d="M150,418 C156,448 154,486 144,510 C141,516 135,514 134,504 C130,478 132,448 138,420 C142,416 148,416 150,418 Z"/>
-          <!-- spine detail -->
-          <path class="detail" d="M120,170 L120,254"/>
-        </svg>
+      <div id="muscle-nav"></div>
+      <div id="ex-results">
+        <div class="placeholder">Pick a muscle group above to see exercises that train it.</div>
       </div>
-      <p class="hint">Front / back views &bull; tap any highlighted area</p>
+    </section>
 
-      <div class="chips" id="chips"></div>
-    </div>
+    <!-- ROUTINES -->
+    <section id="view-routines" class="view">
+      <h2 class="view-title">Starter routines</h2>
+      <p class="view-sub">Pre-built plans for your first weeks. Tap one to see the exercises in order.</p>
+      <div id="routine-list"></div>
+    </section>
 
-    <!-- RIGHT: results -->
-    <div class="panel" id="results">
-      <div class="placeholder">
-        <div class="big">💪</div>
-        <div>Pick a muscle group to get started.</div>
-      </div>
-    </div>
-  </div>
+    <!-- SAVED -->
+    <section id="view-saved" class="view">
+      <h2 class="view-title">Saved exercises</h2>
+      <div id="saved-list"></div>
+    </section>
 
-  <footer>
-    Built for the gym. Always warm up first &amp; start light. Tap “Watch demo” for proper form.
-  </footer>
+    <!-- TIPS -->
+    <section id="view-tips" class="view">
+      <h2 class="view-title">Gym confidence tips</h2>
+      <p class="view-sub">The stuff nobody tells you on day one.</p>
+      <div id="tips-list"></div>
+    </section>
+
+    <footer>Always warm up first &amp; start lighter than you think. Tap “Watch demo” for proper form.</footer>
+  </main>
+
+  <nav class="tabbar">
+    <button data-tab="exercises" class="on" onclick="showTab('exercises')"><span class="ico">≡</span><span class="lab">Exercises</span></button>
+    <button data-tab="routines" onclick="showTab('routines')"><span class="ico">▦</span><span class="lab">Routines</span></button>
+    <button data-tab="saved" onclick="showTab('saved')"><span class="ico">♥</span><span class="lab">Saved</span></button>
+    <button data-tab="tips" onclick="showTab('tips')"><span class="ico">★</span><span class="lab">Tips</span></button>
+  </nav>
 
 <script>
-  // ---- Exercise data ----
-   // Each group: title, subtitle, and a list of beginner-friendly exercises.
+  /* =========================================================================
+     DATA — single source of truth.
+     Each exercise: { key, name, level, yt, equip[], gear, sets, reps, rest,
+                      desc, cues[], mistakes[], secondary[] }
+     - key: unique WITHIN its group; routines reference exercises as "group:key".
+     - equip: drives the equipment filter (subset of EQUIP below).
+     - yt: a real, oEmbed-verified YouTube ID. NEVER invent one (see CLAUDE.md).
+     ========================================================================= */
   const DATA = {
+    /* ---------------- UPPER BODY ---------------- */
     chest: {
-      title: "Chest", sub: "Pectorals — pushing movements",
+      title: "Chest",
       ex: [
-        { name: "Push-up", desc: "Bodyweight, no equipment needed.", level: "Beginner", yt: "IODxDxX7oi4" },
-        { name: "Dumbbell Bench Press", desc: "Lie on a flat bench, press dumbbells up.", level: "Beginner", yt: "J-gWN5hYwRU" },
-        { name: "Incline Dumbbell Press", desc: "Hits the upper chest.", level: "Beginner", yt: "hChjZQhX1Ls" },
-        { name: "Chest Press Machine", desc: "Guided path, great for learning.", level: "Beginner", yt: "pLofEAcfsO8" },
-        { name: "Cable Chest Fly", desc: "Squeeze across the chest.", level: "Intermediate", yt: "8Um35Es-ROE" },
-      ],
-    },
-    shoulders: {
-      title: "Shoulders", sub: "Deltoids — overhead & raising movements",
-      ex: [
-        { name: "Dumbbell Shoulder Press", desc: "Press dumbbells overhead, seated or standing.", level: "Beginner", yt: "qEwKCR5JCog" },
-        { name: "Lateral Raise", desc: "Raise light dumbbells out to the sides.", level: "Beginner", yt: "XNKqPCDtC1k" },
-        { name: "Front Raise", desc: "Raise dumbbells straight in front.", level: "Beginner", yt: "DzF4olZiSBQ" },
-        { name: "Face Pull", desc: "Cable pull to the face for rear delts.", level: "Intermediate", yt: "eTCBSFlCJ_s" },
-        { name: "Arnold Press", desc: "Rotating overhead press.", level: "Intermediate", yt: "6Z15_WdXmVw" },
-      ],
-    },
-    biceps: {
-      title: "Biceps", sub: "Front of the upper arm — curling movements",
-      ex: [
-        { name: "Dumbbell Bicep Curl", desc: "The classic curl, one or both arms.", level: "Beginner", yt: "XE_pHwbst04" },
-        { name: "Hammer Curl", desc: "Neutral grip, also hits the forearm.", level: "Beginner", yt: "zC3nLlEvin4" },
-        { name: "Cable Curl", desc: "Constant tension through the curl.", level: "Beginner", yt: "FTnvwZwLHb4" },
-        { name: "Barbell Curl", desc: "Both arms together with a barbell.", level: "Intermediate", yt: "JJB8XgKltA8" },
-      ],
-    },
-    triceps: {
-      title: "Triceps", sub: "Back of the upper arm — pushing/extension",
-      ex: [
-        { name: "Tricep Pushdown", desc: "Cable pushdown, easy to learn.", level: "Beginner", yt: "_w-HpW70nSQ" },
-        { name: "Overhead Tricep Extension", desc: "Single dumbbell behind the head.", level: "Beginner", yt: "DZgpCf5alfI" },
-        { name: "Bench Dips", desc: "Bodyweight dips off a bench.", level: "Beginner", yt: "j_WpuVY3wbo" },
-        { name: "Close-Grip Push-up", desc: "Hands close together.", level: "Beginner", yt: "W3gBdsTzDrk" },
-      ],
+        { key:"pushup", name:"Push-up", level:"Beginner", yt:"IODxDxX7oi4",
+          equip:["Bodyweight"], gear:"None (drop to your knees to start)", sets:3, reps:"8–12", rest:"60s",
+          desc:"The classic bodyweight press — scales to any level.",
+          cues:["Hands just wider than your shoulders","Straight line head to heels — squeeze your glutes","Lower until your chest is just above the floor"],
+          mistakes:["Letting your hips sag or pike up","Flaring elbows straight out to the sides"],
+          secondary:["Shoulders","Triceps","Core"] },
+        { key:"dbbench", name:"Dumbbell Bench Press", level:"Beginner", yt:"J-gWN5hYwRU",
+          equip:["Dumbbells"], gear:"Dumbbells + flat bench", sets:3, reps:"8–12", rest:"90s",
+          desc:"The main chest builder for beginners.",
+          cues:["Pull your shoulder blades back and down into the bench","Lower to chest level, elbows at about 45°","Press up and slightly together"],
+          mistakes:["Flaring elbows to 90° — hard on the shoulders","Clashing the dumbbells together at the top"],
+          secondary:["Front delts","Triceps"] },
+        { key:"incline", name:"Incline Dumbbell Press", level:"Beginner", yt:"hChjZQhX1Ls",
+          equip:["Dumbbells"], gear:"Dumbbells + incline bench (~30°)", sets:3, reps:"8–12", rest:"90s",
+          desc:"Same press, angled to hit the upper chest.",
+          cues:["Set the bench to about 30° — steeper becomes a shoulder press","Aim the dumbbells at your upper chest","Keep your wrists stacked over your elbows"],
+          mistakes:["Setting the incline too steep","Arching your lower back off the bench"],
+          secondary:["Upper chest","Front delts"] },
+        { key:"machine", name:"Chest Press Machine", level:"Beginner", yt:"pLofEAcfsO8",
+          equip:["Machines"], gear:"Chest press machine", sets:3, reps:"10–12", rest:"60s",
+          desc:"Guided path — the most beginner-friendly way to learn the press.",
+          cues:["Set the seat so the handles line up with mid-chest","Press smoothly, stop just short of locking out","Control the weight back — don't let it slam"],
+          mistakes:["Seat too high or low, changing the angle","Shrugging your shoulders up to your ears"],
+          secondary:["Front delts","Triceps"] },
+        { key:"fly", name:"Cable Chest Fly", level:"Intermediate", yt:"8Um35Es-ROE",
+          equip:["Cables"], gear:"Cable machine, two handles", sets:3, reps:"12–15", rest:"45s",
+          desc:"Isolation move — a wide squeeze across the chest.",
+          cues:["Keep a soft bend in the elbows the whole time","Bring the handles together in front of your chest","Squeeze, then return slowly"],
+          mistakes:["Bending and straightening the elbows (that's a press)","Going so heavy you twist your torso"],
+          secondary:["Front delts"] },
+      ]
     },
     back: {
-      title: "Back / Lats", sub: "Upper back & lats — pulling movements",
+      title: "Back",
       ex: [
-        { name: "Lat Pulldown", desc: "Pull the bar to your chest, seated.", level: "Beginner", yt: "CAwf7n6Luuc" },
-        { name: "Seated Cable Row", desc: "Row the handle to your stomach.", level: "Beginner", yt: "EU7bOadUsNI" },
-        { name: "Bent-Over Dumbbell Row", desc: "Hinge and row dumbbells up.", level: "Beginner", yt: "6TSP1TRMUzs" },
-        { name: "Single-Arm Dumbbell Row", desc: "One knee on a bench, row.", level: "Beginner", yt: "S_kOe9mOLlg" },
-        { name: "Assisted Pull-up", desc: "Machine-assisted pull-ups.", level: "Intermediate", yt: "fnHeovkmkkk" },
-      ],
+        { key:"latpulldown", name:"Lat Pulldown", level:"Beginner", yt:"CAwf7n6Luuc",
+          equip:["Machines"], gear:"Lat pulldown machine", sets:3, reps:"10–12", rest:"60s",
+          desc:"The go-to back exercise — builds the pulling strength for pull-ups.",
+          cues:["Grip just wider than shoulders, thumbs over the bar","Pull the bar to your upper chest, lead with your elbows","Let it rise under control until your arms are straight"],
+          mistakes:["Leaning way back and using momentum","Pulling the bar behind your neck"],
+          secondary:["Biceps","Rear delts"] },
+        { key:"cablerow", name:"Seated Cable Row", level:"Beginner", yt:"EU7bOadUsNI",
+          equip:["Cables","Machines"], gear:"Seated row station", sets:3, reps:"10–12", rest:"60s",
+          desc:"Horizontal pull for the mid-back.",
+          cues:["Sit tall, slight knee bend, chest up","Pull the handle to your belly button, squeeze your shoulder blades","Let your arms extend fully without slouching forward"],
+          mistakes:["Rounding your back at the stretch","Heaving with your whole body / leaning way back"],
+          secondary:["Biceps","Rear delts"] },
+        { key:"dbrow", name:"Bent-Over Dumbbell Row", level:"Beginner", yt:"6TSP1TRMUzs",
+          equip:["Dumbbells"], gear:"Two dumbbells", sets:3, reps:"10–12", rest:"60s",
+          desc:"Free-weight row — also teaches a strong hip hinge.",
+          cues:["Hinge at the hips, back flat, chest toward the floor","Row both dumbbells toward your hips","Keep your neck in line — don't crane it up"],
+          mistakes:["Rounding the lower back","Standing too upright so it becomes a shrug"],
+          secondary:["Biceps","Rear delts","Lower back"] },
+        { key:"onearmrow", name:"Single-Arm Dumbbell Row", level:"Beginner", yt:"S_kOe9mOLlg",
+          equip:["Dumbbells"], gear:"One dumbbell + bench", sets:3, reps:"10–12 each", rest:"60s",
+          desc:"Bench supports you, so it's easy to learn and feel the back working.",
+          cues:["One hand and knee on the bench, back flat like a table","Row the dumbbell to your hip, elbow close to your side","Lower all the way for a full stretch"],
+          mistakes:["Rotating your torso to heave the weight up","Letting your back round toward the floor"],
+          secondary:["Biceps","Rear delts"] },
+        { key:"pullup", name:"Assisted Pull-up", level:"Intermediate", yt:"fnHeovkmkkk",
+          equip:["Machines"], gear:"Assisted pull-up machine", sets:3, reps:"6–10", rest:"90s",
+          desc:"Builds toward a real pull-up with the machine taking some of your weight.",
+          cues:["Pick enough assistance to do clean reps","Start from a full hang, pull your chest toward the bar","Lower slowly — the lowering is what builds strength"],
+          mistakes:["So much assist you bounce off the bottom","Only doing half reps"],
+          secondary:["Biceps","Core"] },
+      ]
+    },
+    shoulders: {
+      title: "Shoulders",
+      ex: [
+        { key:"dbpress", name:"Dumbbell Shoulder Press", level:"Beginner", yt:"qEwKCR5JCog",
+          equip:["Dumbbells"], gear:"Two dumbbells (a bench with a back helps)", sets:3, reps:"8–12", rest:"90s",
+          desc:"The main shoulder builder — press overhead.",
+          cues:["Start with dumbbells at ear height, palms forward","Press straight up until your arms are nearly straight","Keep your ribs down — don't arch your back"],
+          mistakes:["Arching the lower back to push the weight","Letting the dumbbells drift forward"],
+          secondary:["Triceps","Traps"] },
+        { key:"lateral", name:"Lateral Raise", level:"Beginner", yt:"XNKqPCDtC1k",
+          equip:["Dumbbells"], gear:"Light dumbbells", sets:3, reps:"12–15", rest:"45s",
+          desc:"Builds the side delts — the muscle that gives shoulders their shape.",
+          cues:["Tiny bend in the elbows, lead with your elbows","Raise out to the sides to shoulder height","Lower slowly — this one is all control"],
+          mistakes:["Swinging the weight up with momentum","Going heavy and shrugging your traps"],
+          secondary:["Traps"] },
+        { key:"front", name:"Front Raise", level:"Beginner", yt:"DzF4olZiSBQ",
+          equip:["Dumbbells"], gear:"Light dumbbells", sets:3, reps:"12–15", rest:"45s",
+          desc:"Targets the front of the shoulder.",
+          cues:["Raise one or both dumbbells straight in front","Stop at shoulder height, palms down","Control the way down"],
+          mistakes:["Swinging from the lower back","Raising above shoulder height"],
+          secondary:["Upper chest"] },
+        { key:"facepull", name:"Face Pull", level:"Intermediate", yt:"eTCBSFlCJ_s",
+          equip:["Cables"], gear:"Cable + rope at face height", sets:3, reps:"15–20", rest:"45s",
+          desc:"Great for posture and the often-neglected rear delts.",
+          cues:["Set the rope at face height","Pull toward your face, hands splitting apart","Aim your knuckles back past your ears"],
+          mistakes:["Going too heavy and turning it into a row","Letting your elbows drop low"],
+          secondary:["Rear delts","Traps"] },
+        { key:"arnold", name:"Arnold Press", level:"Intermediate", yt:"6Z15_WdXmVw",
+          equip:["Dumbbells"], gear:"Two dumbbells", sets:3, reps:"8–12", rest:"60s",
+          desc:"A rotating press that hits all three heads of the shoulder.",
+          cues:["Start with palms facing you at chin height","Rotate your palms forward as you press overhead","Reverse the rotation on the way down"],
+          mistakes:["Rushing the rotation","Arching the back at the top"],
+          secondary:["Triceps","Traps"] },
+      ]
+    },
+    biceps: {
+      title: "Biceps",
+      ex: [
+        { key:"dbcurl", name:"Dumbbell Bicep Curl", level:"Beginner", yt:"XE_pHwbst04",
+          equip:["Dumbbells"], gear:"Two dumbbells", sets:3, reps:"10–12", rest:"45s",
+          desc:"The classic curl — one arm or both.",
+          cues:["Elbows pinned at your sides","Curl up without swinging, squeeze at the top","Lower all the way down"],
+          mistakes:["Swinging with your back and shoulders","Half-reps — not lowering fully"],
+          secondary:["Forearms"] },
+        { key:"hammer", name:"Hammer Curl", level:"Beginner", yt:"zC3nLlEvin4",
+          equip:["Dumbbells"], gear:"Two dumbbells", sets:3, reps:"10–12", rest:"45s",
+          desc:"Neutral-grip curl — also builds the forearm.",
+          cues:["Palms face each other the whole time","Keep your elbows still, curl up","Control the descent"],
+          mistakes:["Letting the elbows drift forward","Using momentum"],
+          secondary:["Forearms"] },
+        { key:"cablecurl", name:"Cable Curl", level:"Beginner", yt:"FTnvwZwLHb4",
+          equip:["Cables"], gear:"Cable + bar or handle", sets:3, reps:"12–15", rest:"45s",
+          desc:"Constant tension — the cable never lets you rest mid-rep.",
+          cues:["Elbows at your sides","Curl up and squeeze","Slow return, don't let the stack slam"],
+          mistakes:["Leaning back to start the curl","Letting the weight drop fast"],
+          secondary:["Forearms"] },
+        { key:"barbellcurl", name:"Barbell Curl", level:"Intermediate", yt:"JJB8XgKltA8",
+          equip:["Barbell"], gear:"Barbell or EZ-bar", sets:3, reps:"8–12", rest:"60s",
+          desc:"Both arms together — lets you load up a bit heavier.",
+          cues:["Shoulder-width grip, elbows at your sides","Curl the bar up, keep your wrists neutral","Lower under control"],
+          mistakes:["Swinging the bar with your hips","Flaring the elbows out"],
+          secondary:["Forearms"] },
+      ]
+    },
+    triceps: {
+      title: "Triceps",
+      ex: [
+        { key:"pushdown", name:"Tricep Pushdown", level:"Beginner", yt:"_w-HpW70nSQ",
+          equip:["Cables"], gear:"Cable + bar or rope", sets:3, reps:"12–15", rest:"45s",
+          desc:"The easiest tricep move to learn and feel.",
+          cues:["Elbows pinned to your sides","Push down until your arms are straight","Control back up to about 90°"],
+          mistakes:["Letting the elbows flare and drift up","Leaning over the bar to push with bodyweight"],
+          secondary:[] },
+        { key:"overhead", name:"Overhead Tricep Extension", level:"Beginner", yt:"DZgpCf5alfI",
+          equip:["Dumbbells"], gear:"One dumbbell", sets:3, reps:"10–12", rest:"45s",
+          desc:"Overhead angle stretches the long head of the tricep.",
+          cues:["Hold one dumbbell overhead with both hands","Lower behind your head, elbows pointing up","Extend back up, keep the elbows in"],
+          mistakes:["Elbows flaring way out","Arching the lower back"],
+          secondary:[] },
+        { key:"dip", name:"Bench Dips", level:"Beginner", yt:"j_WpuVY3wbo",
+          equip:["Bodyweight"], gear:"A bench or sturdy chair", sets:3, reps:"10–15", rest:"45s",
+          desc:"Bodyweight triceps — adjust your feet to make it easier or harder.",
+          cues:["Hands on the bench edge, fingers pointing forward","Lower by bending the elbows straight back","Keep your back close to the bench"],
+          mistakes:["Rolling the shoulders forward (hard on the joint)","Going too deep if your shoulders feel pinched"],
+          secondary:["Front delts"] },
+        { key:"cgpushup", name:"Close-Grip Push-up", level:"Beginner", yt:"W3gBdsTzDrk",
+          equip:["Bodyweight"], gear:"None", sets:3, reps:"8–12", rest:"60s",
+          desc:"A push-up with hands close — shifts the work to the triceps.",
+          cues:["Hands under your chest, narrower than a normal push-up","Keep your elbows tucked toward your body","Straight line head to heels"],
+          mistakes:["Flaring the elbows out","Letting your hips sag"],
+          secondary:["Chest","Front delts"] },
+      ]
     },
     traps: {
-      title: "Traps", sub: "Upper back / neck — shrugging movements",
+      title: "Traps",
       ex: [
-        { name: "Dumbbell Shrug", desc: "Shrug shoulders straight up.", level: "Beginner", yt: "cJRVVxmytaM" },
-        { name: "Barbell Shrug", desc: "Heavier shrug variation.", level: "Intermediate", yt: "KbsQ1E8Hg0o" },
-        { name: "Face Pull", desc: "Also works upper traps and rear delts.", level: "Intermediate", yt: "eTCBSFlCJ_s" },
-        { name: "Farmer's Carry", desc: "Walk holding heavy dumbbells.", level: "Beginner", yt: "lLAw6fUccKA" },
-      ],
-    },
-    lowerback: {
-      title: "Lower Back", sub: "Spinal erectors — hinge & extension (go light!)",
-      ex: [
-        { name: "Back Extension", desc: "On a hyperextension bench.", level: "Beginner", yt: "gLT-WLH84B4" },
-        { name: "Bird Dog", desc: "Bodyweight core/back stability.", level: "Beginner", yt: "ZdAHe9_HeEw" },
-        { name: "Superman", desc: "Lie face down, lift arms and legs.", level: "Beginner", yt: "9EakJJhONb0" },
-        { name: "Romanian Deadlift", desc: "Hip hinge — focus on form.", level: "Intermediate", yt: "KN5vN3JskqI" },
-      ],
-    },
-    core: {
-      title: "Abs / Core", sub: "Midsection — stability & flexion",
-      ex: [
-        { name: "Plank", desc: "Hold a straight-body position.", level: "Beginner", yt: "mwlp75MS6Rg" },
-        { name: "Crunch", desc: "Curl your shoulders off the floor.", level: "Beginner", yt: "tnZNcIqhGb0" },
-        { name: "Bicycle Crunch", desc: "Alternating elbow-to-knee.", level: "Beginner", yt: "1we3bh9uhqY" },
-        { name: "Leg Raise", desc: "Lift straight legs while lying down.", level: "Beginner", yt: "xJJu-WiROM8" },
-        { name: "Russian Twist", desc: "Rotate side to side, seated.", level: "Intermediate", yt: "IJDOoVyVjhc" },
-      ],
-    },
-    quads: {
-      title: "Quads", sub: "Front of thigh — squatting movements",
-      ex: [
-        { name: "Goblet Squat", desc: "Hold one dumbbell at your chest.", level: "Beginner", yt: "6mf0oa2GGUc" },
-        { name: "Leg Press", desc: "Machine press, easy to scale.", level: "Beginner", yt: "8nm863C0c60" },
-        { name: "Leg Extension", desc: "Machine isolation for the quads.", level: "Beginner", yt: "tTbJBUKnWU8" },
-        { name: "Bodyweight Squat", desc: "Master form before adding weight.", level: "Beginner", yt: "P-yaD24bUE8" },
-        { name: "Walking Lunge", desc: "Step forward, alternate legs.", level: "Intermediate", yt: "vYfp2t4XgqQ" },
-      ],
-    },
-    hamstrings: {
-      title: "Hamstrings", sub: "Back of thigh — hinge & curling movements",
-      ex: [
-        { name: "Seated Leg Curl", desc: "Machine curl for the hamstrings.", level: "Beginner", yt: "14OrOWlM5QU" },
-        { name: "Romanian Deadlift", desc: "Hip hinge with dumbbells/barbell.", level: "Beginner", yt: "KN5vN3JskqI" },
-        { name: "Glute-Ham Bridge", desc: "Bridge with heels pulling in.", level: "Beginner", yt: "PMKya7l4kaI" },
-        { name: "Good Morning", desc: "Light barbell hip hinge.", level: "Intermediate", yt: "0Syp9iyINZ4" },
-      ],
-    },
-    glutes: {
-      title: "Glutes", sub: "Butt — hip extension movements",
-      ex: [
-        { name: "Glute Bridge", desc: "Bodyweight hip lift on the floor.", level: "Beginner", yt: "L9KZfxT654Y" },
-        { name: "Hip Thrust", desc: "Shoulders on bench, drive hips up.", level: "Beginner", yt: "pF17m_CXfL0" },
-        { name: "Bulgarian Split Squat", desc: "Rear foot elevated, single leg.", level: "Intermediate", yt: "yewlXtRs3K4" },
-        { name: "Cable Kickback", desc: "Kick one leg back against a cable.", level: "Beginner", yt: "bVrmtCI00Ys" },
-        { name: "Goblet Squat", desc: "Also builds the glutes.", level: "Beginner", yt: "6mf0oa2GGUc" },
-      ],
-    },
-    calves: {
-      title: "Calves", sub: "Lower leg — ankle raising movements",
-      ex: [
-        { name: "Standing Calf Raise", desc: "Rise onto your toes, slow control.", level: "Beginner", yt: "SorIB5_zO9A" },
-        { name: "Seated Calf Raise", desc: "Machine raise, knees bent.", level: "Beginner", yt: "ORY-ke6vcgk" },
-        { name: "Leg Press Calf Raise", desc: "Push through the balls of your feet.", level: "Beginner", yt: "8k435cj30gc" },
-      ],
+        { key:"dbshrug", name:"Dumbbell Shrug", level:"Beginner", yt:"cJRVVxmytaM",
+          equip:["Dumbbells"], gear:"Two dumbbells", sets:3, reps:"12–15", rest:"45s",
+          desc:"Simplest way to train the upper traps.",
+          cues:["Hold dumbbells at your sides","Shrug straight up toward your ears","Pause at the top, lower slowly"],
+          mistakes:["Rolling the shoulders (no benefit, some risk)","Bending the elbows to cheat"],
+          secondary:[] },
+        { key:"bbshrug", name:"Barbell Shrug", level:"Intermediate", yt:"KbsQ1E8Hg0o",
+          equip:["Barbell"], gear:"Barbell", sets:3, reps:"10–12", rest:"60s",
+          desc:"Heavier shrug variation once you've got the movement down.",
+          cues:["Barbell in front, hands shoulder-width","Shrug straight up — don't roll","Control it down"],
+          mistakes:["Rolling the shoulders","Bouncing with momentum"],
+          secondary:["Forearms"] },
+        { key:"facepull", name:"Face Pull", level:"Intermediate", yt:"eTCBSFlCJ_s",
+          equip:["Cables"], gear:"Cable + rope at face height", sets:3, reps:"15–20", rest:"45s",
+          desc:"Hits the upper traps and rear delts — great for posture.",
+          cues:["Set the rope at face height","Pull toward your face, hands splitting apart","Aim your knuckles back past your ears"],
+          mistakes:["Going too heavy and turning it into a row","Letting your elbows drop low"],
+          secondary:["Rear delts","Shoulders"] },
+        { key:"farmers", name:"Farmer's Carry", level:"Beginner", yt:"lLAw6fUccKA",
+          equip:["Dumbbells"], gear:"Two heavy dumbbells", sets:3, reps:"30–40m walk", rest:"60s",
+          desc:"Just walk holding heavy weight — traps, grip and core all at once.",
+          cues:["Stand tall, shoulders back, brace your core","Walk with controlled steps","Grip hard — that's the point"],
+          mistakes:["Leaning to one side","Letting your shoulders round forward"],
+          secondary:["Forearms","Core"] },
+      ]
     },
     forearms: {
-      title: "Forearms", sub: "Grip & wrist movements",
+      title: "Forearms",
       ex: [
-        { name: "Wrist Curl", desc: "Curl the wrists with light dumbbells.", level: "Beginner", yt: "SqwIBiru46w" },
-        { name: "Reverse Curl", desc: "Curl with palms facing down.", level: "Beginner", yt: "pXx38ZWRYjo" },
-        { name: "Farmer's Carry", desc: "Walk holding heavy dumbbells.", level: "Beginner", yt: "lLAw6fUccKA" },
-      ],
+        { key:"wristcurl", name:"Wrist Curl", level:"Beginner", yt:"SqwIBiru46w",
+          equip:["Dumbbells"], gear:"Light dumbbells", sets:3, reps:"15–20", rest:"45s",
+          desc:"Direct work for the forearm flexors.",
+          cues:["Rest your forearms on your thighs, palms up","Let the weight roll to your fingertips, then curl up","Keep the range small and controlled"],
+          mistakes:["Going too heavy and using your whole arm","Rushing the reps"],
+          secondary:[] },
+        { key:"reversecurl", name:"Reverse Curl", level:"Beginner", yt:"pXx38ZWRYjo",
+          equip:["Dumbbells"], gear:"Two dumbbells", sets:3, reps:"12–15", rest:"45s",
+          desc:"Palms-down curl that builds the top of the forearm.",
+          cues:["Palms face down the whole time","Curl up with elbows at your sides","Lower slowly"],
+          mistakes:["Swinging","Letting your wrists drop"],
+          secondary:["Biceps"] },
+        { key:"farmers", name:"Farmer's Carry", level:"Beginner", yt:"lLAw6fUccKA",
+          equip:["Dumbbells"], gear:"Two heavy dumbbells", sets:3, reps:"30–40m walk", rest:"60s",
+          desc:"Carrying heavy dumbbells is one of the best grip builders there is.",
+          cues:["Stand tall, shoulders back, brace your core","Walk with controlled steps","Grip hard the whole way"],
+          mistakes:["Leaning to one side","Letting your shoulders round forward"],
+          secondary:["Traps","Core"] },
+      ]
+    },
+
+    /* ---------------- CORE ---------------- */
+    core: {
+      title: "Abs",
+      ex: [
+        { key:"plank", name:"Plank", level:"Beginner", yt:"mwlp75MS6Rg",
+          equip:["Bodyweight"], gear:"None (a mat is comfier)", sets:3, reps:"30–60s", rest:"45s",
+          desc:"The foundation — teaches your core to brace and stay solid.",
+          cues:["Forearms under your shoulders","Straight line head to heels, squeeze your glutes","Brace like someone's about to poke your stomach"],
+          mistakes:["Hips sagging or piking up","Holding your breath"],
+          secondary:["Shoulders"] },
+        { key:"crunch", name:"Crunch", level:"Beginner", yt:"tnZNcIqhGb0",
+          equip:["Bodyweight"], gear:"None (a mat helps)", sets:3, reps:"15–20", rest:"30s",
+          desc:"Targets the upper abs.",
+          cues:["Curl your shoulders off the floor","Think about pulling your ribs toward your hips","Lower slowly — don't flop down"],
+          mistakes:["Yanking on your neck","Bouncing up with momentum"],
+          secondary:[] },
+        { key:"bicycle", name:"Bicycle Crunch", level:"Beginner", yt:"1we3bh9uhqY",
+          equip:["Bodyweight"], gear:"None", sets:3, reps:"20 total", rest:"30s",
+          desc:"Adds rotation to hit the obliques.",
+          cues:["Opposite elbow toward opposite knee","Extend the other leg out straight","Slow and controlled beats fast"],
+          mistakes:["Pulling on your neck","Going so fast the rotation disappears"],
+          secondary:["Obliques"] },
+        { key:"legraise", name:"Leg Raise", level:"Beginner", yt:"xJJu-WiROM8",
+          equip:["Bodyweight"], gear:"None (a mat helps)", sets:3, reps:"10–15", rest:"45s",
+          desc:"Hits the lower abs.",
+          cues:["Lie flat, press your lower back into the floor","Raise straight legs toward vertical","Lower slowly, stop before your back arches"],
+          mistakes:["Letting the lower back arch off the floor","Dropping the legs fast"],
+          secondary:["Hip flexors"] },
+        { key:"twist", name:"Russian Twist", level:"Intermediate", yt:"IJDOoVyVjhc",
+          equip:["Bodyweight","Dumbbells"], gear:"Optional dumbbell or plate", sets:3, reps:"20 total", rest:"45s",
+          desc:"Rotational core work — good carryover for an athlete.",
+          cues:["Lean back to about 45°, chest up","Rotate from your ribs, not just your arms","Tap each side under control"],
+          mistakes:["Rounding your back","Just waving your arms without rotating"],
+          secondary:["Obliques"] },
+      ]
+    },
+    lowerback: {
+      title: "Lower back",
+      ex: [
+        { key:"backext", name:"Back Extension", level:"Beginner", yt:"gLT-WLH84B4",
+          equip:["Machines"], gear:"Hyperextension / 45° bench", sets:3, reps:"12–15", rest:"60s",
+          desc:"Strengthens the lower-back muscles that protect your spine.",
+          cues:["Pads at your hips, not your stomach","Lower with a flat back, rise to a straight line","Don't crank past straight into a backbend"],
+          mistakes:["Hyperextending up into an arch","Jerking up with momentum"],
+          secondary:["Glutes","Hamstrings"] },
+        { key:"birddog", name:"Bird Dog", level:"Beginner", yt:"ZdAHe9_HeEw",
+          equip:["Bodyweight"], gear:"None (a mat helps)", sets:3, reps:"10 each side", rest:"45s",
+          desc:"Gentle stability work — teaches your back and core to work together.",
+          cues:["On all fours, back flat","Extend opposite arm and leg, reach long","Move slowly, keep your hips level"],
+          mistakes:["Letting the hips rotate","Arching the back as you reach"],
+          secondary:["Glutes","Core"] },
+        { key:"superman", name:"Superman", level:"Beginner", yt:"9EakJJhONb0",
+          equip:["Bodyweight"], gear:"None (a mat helps)", sets:3, reps:"12–15", rest:"45s",
+          desc:"Bodyweight extension for the whole back chain.",
+          cues:["Lie face down, arms reaching ahead","Lift your arms, chest and legs a few inches","Squeeze, hold a beat, lower"],
+          mistakes:["Yanking up too high and straining the neck","Holding your breath"],
+          secondary:["Glutes"] },
+        { key:"rdl", name:"Romanian Deadlift", level:"Intermediate", yt:"KN5vN3JskqI",
+          equip:["Barbell","Dumbbells"], gear:"Barbell or dumbbells", sets:3, reps:"8–10", rest:"90s",
+          desc:"The hip hinge — trains the whole back of the body. Worth learning well.",
+          cues:["Soft knees, push your hips back","Slide the weight down your legs, back flat","Feel the hamstring stretch, then drive your hips forward"],
+          mistakes:["Rounding the back","Squatting it down instead of hinging"],
+          secondary:["Hamstrings","Glutes"] },
+      ]
+    },
+
+    /* ---------------- LOWER BODY ---------------- */
+    glutes: {
+      title: "Glutes",
+      ex: [
+        { key:"bridge", name:"Glute Bridge", level:"Beginner", yt:"L9KZfxT654Y",
+          equip:["Bodyweight"], gear:"None (a mat helps)", sets:3, reps:"12–15", rest:"45s",
+          desc:"Bodyweight intro to hip drive — feel the glutes before you load them.",
+          cues:["On your back, heels close to your hips","Drive through your heels, lift hips to a straight line","Squeeze your glutes hard at the top"],
+          mistakes:["Arching the lower back instead of using the glutes","Pushing through your toes"],
+          secondary:["Hamstrings","Core"] },
+        { key:"hipthrust", name:"Hip Thrust", level:"Beginner", yt:"pF17m_CXfL0",
+          equip:["Barbell","Dumbbells"], gear:"Bench + barbell or dumbbell (use a pad)", sets:4, reps:"8–12", rest:"90s",
+          desc:"The single best glute builder — and you can load it heavy.",
+          cues:["Upper back on the bench, weight over your hips","Drive through your heels until your torso is parallel to the floor","Squeeze your glutes at the top, ribs down"],
+          mistakes:["Overarching your back at the top","Pushing through your toes instead of heels"],
+          secondary:["Hamstrings"] },
+        { key:"bulgarian", name:"Bulgarian Split Squat", level:"Intermediate", yt:"yewlXtRs3K4",
+          equip:["Dumbbells","Bodyweight"], gear:"Bench + optional dumbbells", sets:3, reps:"8–10 each", rest:"75s",
+          desc:"A single-leg builder that suits strong, athletic legs.",
+          cues:["Rear foot on the bench, most of your weight on the front leg","Drop straight down, front knee tracking over your foot","Drive up through the front heel"],
+          mistakes:["Front foot too close so the knee shoots forward","Leaning so far it becomes a quad-only move"],
+          secondary:["Quads","Hamstrings"] },
+        { key:"kickback", name:"Cable Kickback", level:"Beginner", yt:"bVrmtCI00Ys",
+          equip:["Cables"], gear:"Cable + ankle strap", sets:3, reps:"12–15 each", rest:"45s",
+          desc:"Isolation move to target and feel one glute at a time.",
+          cues:["Ankle strap on, slight forward lean","Kick the leg straight back, squeeze the glute","Slow return, keep your hips square"],
+          mistakes:["Arching the back to swing the leg higher","Rushing the reps"],
+          secondary:["Hamstrings"] },
+        { key:"goblet", name:"Goblet Squat", level:"Beginner", yt:"6mf0oa2GGUc",
+          equip:["Dumbbells"], gear:"One dumbbell or kettlebell", sets:3, reps:"10–12", rest:"75s",
+          desc:"Holding the weight up front also lights up the glutes.",
+          cues:["Hold the weight at your chest, elbows down","Sit down between your hips, chest up","Push the floor away to stand"],
+          mistakes:["Heels lifting off the floor","Knees caving inward"],
+          secondary:["Quads","Core"] },
+      ]
+    },
+    quads: {
+      title: "Quads",
+      ex: [
+        { key:"goblet", name:"Goblet Squat", level:"Beginner", yt:"6mf0oa2GGUc",
+          equip:["Dumbbells"], gear:"One dumbbell or kettlebell", sets:3, reps:"10–12", rest:"75s",
+          desc:"The easiest squat to learn — the weight up front keeps you upright.",
+          cues:["Hold the weight at your chest, elbows down","Sit down between your hips, chest up","Push the floor away to stand"],
+          mistakes:["Heels lifting off the floor","Knees caving inward"],
+          secondary:["Glutes","Core"] },
+        { key:"legpress", name:"Leg Press", level:"Beginner", yt:"8nm863C0c60",
+          equip:["Machines"], gear:"Leg press machine", sets:3, reps:"10–12", rest:"90s",
+          desc:"Loads the legs heavy with the machine guiding the path.",
+          cues:["Feet shoulder-width on the platform","Lower until your knees reach about 90°","Press through your heels, don't slam into lockout"],
+          mistakes:["Going so deep your lower back rounds off the seat","Snapping the knees into a hard lockout"],
+          secondary:["Glutes","Hamstrings"] },
+        { key:"legext", name:"Leg Extension", level:"Beginner", yt:"tTbJBUKnWU8",
+          equip:["Machines"], gear:"Leg extension machine", sets:3, reps:"12–15", rest:"45s",
+          desc:"Pure quad isolation.",
+          cues:["Pad on your lower shin, knees at the seat's pivot","Straighten your legs, squeeze the quads","Lower under control"],
+          mistakes:["Swinging the weight up with momentum","Pad set too high on the shin"],
+          secondary:[] },
+        { key:"bwsquat", name:"Bodyweight Squat", level:"Beginner", yt:"P-yaD24bUE8",
+          equip:["Bodyweight"], gear:"None", sets:3, reps:"15–20", rest:"45s",
+          desc:"Great warm-up and a chance to groove your squat pattern.",
+          cues:["Feet shoulder-width, toes slightly out","Sit your hips back and down","Chest up, knees tracking over your toes"],
+          mistakes:["Knees caving in","Heels coming off the floor"],
+          secondary:["Glutes"] },
+        { key:"lunge", name:"Walking Lunge", level:"Intermediate", yt:"vYfp2t4XgqQ",
+          equip:["Dumbbells","Bodyweight"], gear:"Bodyweight or dumbbells", sets:3, reps:"10–12 each", rest:"60s",
+          desc:"Single-leg strength and balance — soccer legs will take to it.",
+          cues:["Step forward into a long stride","Drop the back knee toward the floor","Push through the front heel to the next step"],
+          mistakes:["Short steps that push the knee past the toes","Leaning your torso forward"],
+          secondary:["Glutes","Hamstrings"] },
+      ]
+    },
+    hamstrings: {
+      title: "Hamstrings",
+      ex: [
+        { key:"legcurl", name:"Seated Leg Curl", level:"Beginner", yt:"14OrOWlM5QU",
+          equip:["Machines"], gear:"Leg curl machine", sets:3, reps:"12–15", rest:"60s",
+          desc:"Isolates the hamstrings with the machine doing the stabilising.",
+          cues:["Pad on your lower calves, thighs locked down","Curl your heels toward your glutes","Slow return, don't let it slam"],
+          mistakes:["Lifting your hips off the seat","Using momentum"],
+          secondary:["Calves"] },
+        { key:"rdl", name:"Romanian Deadlift", level:"Beginner", yt:"KN5vN3JskqI",
+          equip:["Barbell","Dumbbells"], gear:"Barbell or dumbbells", sets:3, reps:"8–10", rest:"90s",
+          desc:"The key hamstring builder — a hip hinge, not a squat.",
+          cues:["Soft knees, push your hips back","Slide the weight down your legs, back flat","Feel the hamstring stretch, then drive your hips forward"],
+          mistakes:["Rounding the back","Squatting it down instead of hinging"],
+          secondary:["Glutes","Lower back"] },
+        { key:"ghbridge", name:"Glute-Ham Bridge", level:"Beginner", yt:"PMKya7l4kaI",
+          equip:["Bodyweight"], gear:"None (a mat helps)", sets:3, reps:"12–15", rest:"45s",
+          desc:"A bridge with your heels further out to pull in the hamstrings.",
+          cues:["Heels a bit further out than a normal glute bridge","Dig your heels in and lift your hips","Think about curling your heels toward you"],
+          mistakes:["Pushing through your toes","Arching the lower back"],
+          secondary:["Glutes"] },
+      ]
+    },
+    calves: {
+      title: "Calves",
+      ex: [
+        { key:"standingcalf", name:"Standing Calf Raise", level:"Beginner", yt:"SorIB5_zO9A",
+          equip:["Machines","Bodyweight"], gear:"Calf machine, a step, or just the floor", sets:3, reps:"15–20", rest:"45s",
+          desc:"Hits the larger calf muscle with the knee straight.",
+          cues:["Balls of your feet on the edge, heels hanging","Rise as high as you can onto your toes","Lower slowly for a full stretch at the bottom"],
+          mistakes:["Bouncing through the reps","Cutting the range short"],
+          secondary:[] },
+        { key:"seatedcalf", name:"Seated Calf Raise", level:"Beginner", yt:"ORY-ke6vcgk",
+          equip:["Machines"], gear:"Seated calf machine", sets:3, reps:"15–20", rest:"45s",
+          desc:"Bent knee shifts the work to the deeper calf muscle.",
+          cues:["Pad on your lower thighs, balls of your feet on the platform","Press up onto your toes","Slow stretch at the bottom"],
+          mistakes:["Half reps","Bouncing"],
+          secondary:[] },
+        { key:"lpcalf", name:"Leg Press Calf Raise", level:"Beginner", yt:"8k435cj30gc",
+          equip:["Machines"], gear:"Leg press machine", sets:3, reps:"15–20", rest:"45s",
+          desc:"Uses the leg press to load the calves heavy and safe.",
+          cues:["Feet low on the platform, balls of the feet only","Press the platform away by pointing your toes","Control it back for a stretch"],
+          mistakes:["Bending the knees to push (that's a leg press)","Tiny bouncy reps"],
+          secondary:[] },
+      ]
     },
   };
 
+  /* ---- Region grouping for the muscle picker ---- */
+  const REGIONS = [
+    { name:"Upper body", groups:["chest","back","shoulders","biceps","triceps","traps","forearms"] },
+    { name:"Core", groups:["core","lowerback"] },
+    { name:"Lower body", groups:["glutes","quads","hamstrings","calves"] },
+  ];
+
+  /* ---- Equipment filter options ---- */
+  const EQUIP = ["Bodyweight","Dumbbells","Cables","Machines","Barbell"];
+
+  /* ---- Starter routines (reference exercises by "group:key") ---- */
+  const ROUTINES = [
+    { name:"Full body — 3× a week", meta:"6 exercises · ~45 min · Beginner",
+      note:"The best place to start. Do all six in order, two or three times a week with a rest day in between.",
+      days:[ { name:null, items:["chest:dbbench","back:latpulldown","quads:goblet","glutes:hipthrust","shoulders:dbpress","core:plank"] } ] },
+    { name:"Glute focus", meta:"5 exercises · ~35 min · Beginner",
+      note:"Built around strong legs — heavy hips and hamstrings with a calf finisher.",
+      days:[ { name:null, items:["glutes:hipthrust","hamstrings:rdl","glutes:bulgarian","glutes:kickback","calves:standingcalf"] } ] },
+    { name:"Upper / lower split — 4 days", meta:"2 upper + 2 lower days · Beginner–intermediate",
+      note:"When you're ready to train four days a week, alternate an upper day and a lower day.",
+      days:[
+        { name:"Upper day", items:["chest:dbbench","back:latpulldown","shoulders:dbpress","biceps:dbcurl","triceps:pushdown"] },
+        { name:"Lower day", items:["quads:goblet","hamstrings:rdl","glutes:hipthrust","calves:standingcalf","core:plank"] },
+      ] },
+  ];
+
+  /* ---- Gym confidence tips ---- */
+  const TIPS = [
+    "Ask a staff member to show you a machine the first time — everyone does this, and no one thinks twice about it.",
+    "Start lighter than you think. Nail the movement first; add weight once it feels easy.",
+    "Rest 60–90 seconds between sets. It can feel like a long time just standing there — that's completely normal.",
+    "It's fine to sit on a machine between sets. Bring earphones — most people are in their own world, not watching you.",
+    "Two solid sessions a week you actually enjoy beat five you dread. Consistency wins over intensity.",
+    "Muscle burn is good. Sharp joint pain or a pinch is not — stop, re-check your form, or swap the exercise.",
+    "Wipe a machine down when you're done and re-rack your weights. That's the whole etiquette, really.",
+  ];
+
+  /* =========================================================================
+     Flat lookup: every exercise addressable as "group:key".
+     ========================================================================= */
+  const ALL = {};
+  Object.keys(DATA).forEach(g => {
+    DATA[g].ex.forEach(e => { ALL[`${g}:${e.key}`] = Object.assign({}, e, { group:g, groupTitle:DATA[g].title }); });
+  });
+
   const YT = "https://www.youtube.com/results?search_query=";
 
-  function show(group) {
-    const d = DATA[group];
-    if (!d) return;
-
-    // highlight selection across both svgs
-    document.querySelectorAll('.muscle').forEach(m => {
-      m.classList.toggle('selected', m.dataset.group === group);
-    });
-    // highlight matching chip
-    document.querySelectorAll('#chips button').forEach(b => {
-      b.classList.toggle('on', b.dataset.group === group);
-    });
-
-    const items = d.ex.map(e => {
-      const q = encodeURIComponent(e.name + " proper form tutorial");
-      return `
-        <div class="ex-wrap">
-          <div class="ex">
-            <div class="info">
-              <div class="name">${e.name}</div>
-              <div class="desc">${e.desc}</div>
-              <span class="badge">${e.level}</span>
-            </div>
-            <button class="watch" onclick="toggleVid(this)" data-yt="${e.yt}" data-q="${q}">▶ Watch</button>
-          </div>
-          <div class="player"></div>
-        </div>`;
-    }).join("");
-
-    document.getElementById('results').innerHTML = `
-      <div class="group-head"><span class="dot"></span><h2>${d.title}</h2></div>
-      <p class="group-sub">${d.sub}</p>
-      ${items}`;
-
-    if (window.innerWidth <= 760) {
-      document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  /* ---- Saved (localStorage, degrades gracefully in private mode) ---- */
+  let SAVED = new Set();
+  let canSave = true;
+  try {
+    localStorage.setItem("wf_test", "1");
+    localStorage.removeItem("wf_test");
+    SAVED = new Set(JSON.parse(localStorage.getItem("wf_saved") || "[]"));
+  } catch (e) { canSave = false; }
+  function persistSaved() {
+    if (!canSave) return;
+    try { localStorage.setItem("wf_saved", JSON.stringify([...SAVED])); } catch (e) {}
   }
 
-  // Expand/collapse an inline YouTube player under an exercise (one open at a time).
+  /* =========================================================================
+     Rendering
+     ========================================================================= */
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c])); }
+
+  function cardHTML(id) {
+    const e = ALL[id];
+    const saved = SAVED.has(id);
+    const q = encodeURIComponent(e.name + " proper form tutorial");
+    const cues = e.cues.map(c => `<li>${esc(c)}</li>`).join("");
+    const mistakes = e.mistakes.map(m => `<li>${esc(m)}</li>`).join("");
+    const sec = (e.secondary && e.secondary.length)
+      ? `<span class="pill"><span class="pill-k">Also works</span> ${esc(e.secondary.join(", "))}</span>` : "";
+    return `
+      <div class="ex-wrap">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-name">${esc(e.name)}</div>
+            <span class="lvl ${e.level === "Beginner" ? "beg" : "int"}">${esc(e.level)}</span>
+          </div>
+          <div class="card-desc">${esc(e.desc)}</div>
+          <div class="srr">
+            <div><b>${esc(e.sets)}</b><span>sets</span></div>
+            <div><b>${esc(e.reps)}</b><span>reps</span></div>
+            <div><b>${esc(e.rest)}</b><span>rest</span></div>
+          </div>
+          <div class="block"><div class="block-h">Form cues</div><ul class="cues">${cues}</ul></div>
+          <div class="block"><div class="block-h warn">Common mistakes</div><ul class="mistakes">${mistakes}</ul></div>
+          <div class="pills">
+            <span class="pill"><span class="pill-k">Gear</span> ${esc(e.gear)}</span>
+            ${sec}
+          </div>
+          <div class="actions">
+            <button class="watch" onclick="toggleVid(this)" data-yt="${e.yt}" data-q="${q}"
+                    data-label="▶ Watch demo" data-close="✕ Close">▶ Watch demo</button>
+            <button class="save ${saved ? "on" : ""}" onclick="toggleSave(this)" data-id="${id}">${saved ? "♥ Saved" : "♡ Save"}</button>
+          </div>
+        </div>
+        <div class="player"></div>
+      </div>`;
+  }
+
+  function rowHTML(id) {
+    const e = ALL[id];
+    const q = encodeURIComponent(e.name + " proper form tutorial");
+    return `
+      <div class="rrow">
+        <div class="rrow-main">
+          <span class="rrow-name">${esc(e.name)}</span>
+          <span class="rrow-meta">${esc(e.sets)} sets × ${esc(e.reps)}</span>
+        </div>
+        <button class="rwatch" onclick="toggleVid(this)" data-yt="${e.yt}" data-q="${q}"
+                data-label="▶" data-close="✕">▶</button>
+        <div class="player"></div>
+      </div>`;
+  }
+
+  /* ---- Exercises view ---- */
+  let currentGroup = null;
+  const activeEquip = new Set(EQUIP); // city gym — everything on by default
+
+  function showGroup(group) {
+    currentGroup = group;
+    document.querySelectorAll("#muscle-nav button").forEach(b => b.classList.toggle("on", b.dataset.group === group));
+    const d = DATA[group];
+    const ids = d.ex.map(e => `${group}:${e.key}`).filter(id => ALL[id].equip.some(x => activeEquip.has(x)));
+    const res = document.getElementById("ex-results");
+    if (!ids.length) {
+      res.innerHTML = `<div class="empty">No ${esc(d.title.toLowerCase())} exercises match your equipment filter. Turn more equipment on above.</div>`;
+      return;
+    }
+    res.innerHTML =
+      `<div class="res-head"><h2>${esc(d.title)}</h2><span class="count">${ids.length} exercise${ids.length > 1 ? "s" : ""}</span></div>`
+      + ids.map(cardHTML).join("");
+    if (window.innerWidth <= 760) res.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function toggleEquip(btn) {
+    const x = btn.dataset.eq;
+    if (activeEquip.has(x)) { activeEquip.delete(x); btn.classList.remove("on"); }
+    else { activeEquip.add(x); btn.classList.add("on"); }
+    if (currentGroup) showGroup(currentGroup);
+  }
+
+  /* ---- Video ---- */
+  function closeAllPlayers() {
+    document.querySelectorAll(".player.open").forEach(p => { p.classList.remove("open"); p.innerHTML = ""; });
+    document.querySelectorAll("[data-open='1']").forEach(b => { b.dataset.open = "0"; b.textContent = b.dataset.label; });
+  }
   function toggleVid(btn) {
-    const player = btn.closest('.ex-wrap').querySelector('.player');
-    const isOpen = player.classList.contains('open');
-    document.querySelectorAll('.player.open').forEach(p => { p.classList.remove('open'); p.innerHTML = ''; });
-    document.querySelectorAll('.watch.on').forEach(b => { b.classList.remove('on'); b.textContent = '▶ Watch'; });
-    if (isOpen) return; // tapping the open one just closes it
+    const wrap = btn.closest(".ex-wrap, .rrow");
+    const player = wrap.querySelector(".player");
+    const isOpen = player.classList.contains("open");
+    closeAllPlayers();
+    if (isOpen) return;
     player.innerHTML =
       `<iframe src="https://www.youtube-nocookie.com/embed/${btn.dataset.yt}?rel=0&autoplay=1&playsinline=1"`
       + ` title="Exercise demo" loading="lazy"`
       + ` allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"`
       + ` allowfullscreen></iframe>`
       + `<a class="fallback" href="${YT}${btn.dataset.q}" target="_blank" rel="noopener">Not the right video? Search YouTube ↗</a>`;
-    player.classList.add('open');
-    btn.classList.add('on');
-    btn.textContent = '✕ Close';
-    if (window.innerWidth <= 760) player.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    player.classList.add("open");
+    btn.dataset.open = "1";
+    btn.textContent = btn.dataset.close;
+    if (window.innerWidth <= 760) player.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  function setView(v) {
-    const front = v === 'front';
-    document.getElementById('svg-front').classList.toggle('on', front);
-    document.getElementById('svg-back').classList.toggle('on', !front);
-    document.getElementById('btn-front').classList.toggle('on', front);
-    document.getElementById('btn-back').classList.toggle('on', !front);
+  /* ---- Save ---- */
+  function toggleSave(btn) {
+    const id = btn.dataset.id;
+    if (SAVED.has(id)) SAVED.delete(id); else SAVED.add(id);
+    persistSaved();
+    const on = SAVED.has(id);
+    document.querySelectorAll(".save").forEach(b => {
+      if (b.dataset.id === id) { b.classList.toggle("on", on); b.textContent = on ? "♥ Saved" : "♡ Save"; }
+    });
+    if (currentTab === "saved") renderSaved();
   }
 
-  document.querySelectorAll('.muscle').forEach(m => {
-    m.addEventListener('click', () => show(m.dataset.group));
-  });
+  function renderSaved() {
+    const wrap = document.getElementById("saved-list");
+    const banner = canSave ? "" :
+      `<div class="banner">Heads up — saving isn't available in private / incognito mode, so favorites won't stick after you close the tab.</div>`;
+    const ids = [...SAVED].filter(id => ALL[id]);
+    if (!ids.length) {
+      wrap.innerHTML = banner + `<div class="empty">Tap “♡ Save” on any exercise and it'll show up here.</div>`;
+      return;
+    }
+    wrap.innerHTML = banner + ids.map(cardHTML).join("");
+  }
 
-  // Build quick-pick chips from the data, in a sensible order.
-  const CHIP_ORDER = ["chest","back","shoulders","biceps","triceps","forearms",
-                      "core","lowerback","traps","glutes","quads","hamstrings","calves"];
-  const chips = document.getElementById('chips');
-  CHIP_ORDER.forEach(g => {
-    const b = document.createElement('button');
-    b.dataset.group = g;
-    b.textContent = DATA[g].title;
-    b.addEventListener('click', () => show(g));
-    chips.appendChild(b);
-  });
+  /* ---- Routines ---- */
+  function renderRoutines() {
+    document.getElementById("routine-list").innerHTML = ROUTINES.map((r, i) => {
+      const days = r.days.map(day => {
+        const head = day.name ? `<div class="day-h">${esc(day.name)}</div>` : "";
+        return head + day.items.map(rowHTML).join("");
+      }).join("");
+      return `
+        <div class="routine">
+          <button class="routine-head" onclick="toggleRoutine(${i})">
+            <div><div class="routine-name">${esc(r.name)}</div><div class="routine-meta">${esc(r.meta)}</div></div>
+            <span class="chev" id="chev-${i}">▾</span>
+          </button>
+          <div class="routine-body" id="rbody-${i}">
+            <p class="routine-note">${esc(r.note)}</p>
+            ${days}
+          </div>
+        </div>`;
+    }).join("");
+  }
+  function toggleRoutine(i) {
+    const body = document.getElementById("rbody-" + i);
+    const chev = document.getElementById("chev-" + i);
+    const open = body.classList.toggle("open");
+    chev.textContent = open ? "▴" : "▾";
+  }
+
+  /* ---- Tips ---- */
+  function renderTips() {
+    document.getElementById("tips-list").innerHTML = TIPS.map(t => `<div class="tip">${esc(t)}</div>`).join("");
+  }
+
+  /* ---- Tabs ---- */
+  let currentTab = "exercises";
+  function showTab(t) {
+    currentTab = t;
+    closeAllPlayers();
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
+    document.getElementById("view-" + t).classList.add("on");
+    document.querySelectorAll(".tabbar button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
+    if (t === "saved") renderSaved();
+    window.scrollTo(0, 0);
+  }
+
+  /* =========================================================================
+     Init
+     ========================================================================= */
+  (function init() {
+    // equipment chips
+    const ec = document.getElementById("equip-chips");
+    EQUIP.forEach(x => {
+      const b = document.createElement("button");
+      b.dataset.eq = x; b.textContent = x; b.className = "on";
+      b.addEventListener("click", () => toggleEquip(b));
+      ec.appendChild(b);
+    });
+    // muscle nav by region
+    const mn = document.getElementById("muscle-nav");
+    REGIONS.forEach(r => {
+      const h = document.createElement("div"); h.className = "region-h"; h.textContent = r.name; mn.appendChild(h);
+      const row = document.createElement("div"); row.className = "muscle-chips";
+      r.groups.forEach(g => {
+        const b = document.createElement("button");
+        b.dataset.group = g; b.textContent = DATA[g].title;
+        b.addEventListener("click", () => showGroup(g));
+        row.appendChild(b);
+      });
+      mn.appendChild(row);
+    });
+    renderRoutines();
+    renderTips();
+    renderSaved();
+  })();
 </script>
 </body>
 </html>

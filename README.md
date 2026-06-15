@@ -92,7 +92,8 @@ The app is five tabs, switched from a fixed bottom nav bar:
    - **Your routines:** tap **＋ Routine** on any exercise → a popup menu lets you add
      it to an existing routine or **create a new named routine** on the spot (without
      leaving the page). Saved routines persist in `localStorage`; on this tab each is
-     expandable and editable in place — remove an exercise (✕) or delete the routine.
+     expandable and editable in place — **rename** it, remove an exercise (✕), or
+     delete the routine.
    - **Starter routines**: three expandable pre-built programs. Each lists its
      exercises with sets × reps and a quick ▶ video, plus **"Save a copy"** to drop
      an editable copy into your own routines.
@@ -221,7 +222,8 @@ the **Upper & side** focus.
     routine, **`createRoutineFromMenu()`** makes a new named routine containing it,
     **`closeRoutineMenu()`** dismisses it.
   - **`removeExFromRoutine(rid, exId)` / `deleteRoutine(uid)`** — in-place edits on the
-    Routines tab. **`saveCopyOfBuiltin(i)`** flattens a built-in into an editable copy.
+    Routines tab. **`startRename` / `commitRename` / `cancelRename`** drive the inline
+    rename. **`saveCopyOfBuiltin(i)`** flattens a built-in into an editable copy.
   - **`renderRoutinesTab()`** — renders the Routines tab: `renderMyRoutines()` (saved
     customs, editable) + `renderRoutines()` (built-ins).
   - **`toggleRoutine(uid)`** — expand/collapse a routine; `uid` is `"b"+i` for

@@ -1200,6 +1200,20 @@
     MYROUTINES = MYROUTINES.filter(r => r.id !== uid);
     persistRoutines(); renderRoutinesTab();
   }
+  // inline rename of a saved routine (renamingId drives which routine shows the input)
+  let renamingId = null;
+  function startRename(uid) {
+    renamingId = uid; renderRoutinesTab();
+    const el = document.getElementById("rename-" + uid);
+    if (el) { el.focus(); el.select(); }
+  }
+  function commitRename(uid) {
+    const el = document.getElementById("rename-" + uid);
+    const r = MYROUTINES.find(x => x.id === uid);
+    if (el && r) { const v = el.value.trim(); if (v) r.name = v; persistRoutines(); }
+    renamingId = null; renderRoutinesTab();
+  }
+  function cancelRename() { renamingId = null; renderRoutinesTab(); }
   function saveCopyOfBuiltin(i) {
     const r = ROUTINES[i];
     const items = r.days.reduce((a, d) => a.concat(d.items), []).filter(id => ALL[id]);
@@ -1425,16 +1439,29 @@
             <div class="player"></div>
           </div>`;
       }).join("") || `<div class="rm-empty">No exercises yet — add some from the Exercises tab.</div>`;
+      const editing = renamingId === uid;
+      const renameRow = editing
+        ? `<div class="rm-new" style="margin-bottom:10px;">
+             <input id="rename-${uid}" type="text" maxlength="40" value="${esc(r.name)}" autocomplete="off"
+                    onkeydown="if(event.key==='Enter')commitRename('${uid}');if(event.key==='Escape')cancelRename()">
+             <button class="btn-primary" onclick="commitRename('${uid}')">Save</button>
+           </div>` : "";
+      const actions = editing
+        ? `<button class="btn-ghost" onclick="cancelRename()">Cancel</button>
+           <button class="btn-ghost danger" onclick="deleteRoutine('${uid}')">Delete routine</button>`
+        : `<button class="btn-ghost" onclick="startRename('${uid}')">Rename</button>
+           <button class="btn-ghost danger" onclick="deleteRoutine('${uid}')">Delete routine</button>`;
       return `
         <div class="routine">
           <button class="routine-head" onclick="toggleRoutine('${uid}')">
             <div><div class="routine-name">${esc(r.name)}</div><div class="routine-meta">${items.length} exercise${items.length !== 1 ? "s" : ""} · yours</div></div>
-            <span class="chev" id="chev-${uid}">▾</span>
+            <span class="chev" id="chev-${uid}">${editing ? "▴" : "▾"}</span>
           </button>
-          <div class="routine-body" id="rbody-${uid}">
+          <div class="routine-body${editing ? " open" : ""}" id="rbody-${uid}">
+            ${renameRow}
             ${rows}
             <div class="builder-actions">
-              <button class="btn-ghost danger" onclick="deleteRoutine('${uid}')">Delete routine</button>
+              ${actions}
             </div>
           </div>
         </div>`;

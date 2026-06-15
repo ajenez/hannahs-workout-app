@@ -85,8 +85,14 @@ The app is four tabs, switched from a fixed bottom nav bar:
      **Shoulders** (Front / Side / Rear), **Back** (Lats / Mid-back), **Abs**
      (Upper / Lower / Obliques). "All" is the default; the focus chips stack with
      the equipment filter.
-2. **Routines** — three expandable starter programs. Each lists its exercises in
-   order with sets × reps and a quick ▶ video button.
+2. **Routines** — build your own and use pre-made ones:
+   - **Routine builder** ("Your routines"): tap **＋ Routine** on any exercise to
+     collect it, then in this tab name it, reorder (▲▼) or remove (✕) exercises, and
+     **Save**. Saved custom routines persist in `localStorage` and can be edited or
+     deleted. The draft survives a reload too.
+   - **Starter routines**: three expandable pre-built programs. Each lists its
+     exercises with sets × reps and a quick ▶ video, plus **"Save a copy"** to drop
+     an editable copy into your own routines.
 3. **Saved** — favorited exercises (full cards), persisted in `localStorage`.
 4. **Tips** — short gym-confidence tips.
 
@@ -94,9 +100,10 @@ The app is four tabs, switched from a fixed bottom nav bar:
 Each exercise shows: name, a **Beginner / Intermediate** badge, a one-line
 description, a **video thumbnail** (the YouTube poster image — tap it to expand the
 inline player; tap again to close), a **sets · reps · rest** row, **form cues**,
-**common mistakes**, a **gear** pill, a **secondary muscles** pill, and a **♡ Save**
-button. (The thumbnail is the play control — Hannah is a visual learner, so cards
-lead with the image rather than a text button.)
+**common mistakes**, a **gear** pill, a **secondary muscles** pill, a **♡ Save**
+button, and a **＋ Routine** button (adds it to the routine builder). (The thumbnail
+is the play control — Hannah is a visual learner, so cards lead with the image
+rather than a text button.)
 
 ### Covered muscle groups (13) / exercises (66)
 chest, back, shoulders, biceps, triceps, traps, forearms (upper); abs, lower back
@@ -170,8 +177,13 @@ the **Upper & side** focus.
     assigns each exercise to one focus. Focus is **not** stored on the `DATA` object —
     it's attached when `ALL` is built. A group absent from `FOCUS` simply shows no
     focus row. To add a focus to a group, add it to both `FOCUS` and `FOCUS_MAP`.
-  - **`ROUTINES`** — array of starter programs; each has `days[]`, each day a list
-    of `"group:key"` item strings.
+  - **`ROUTINES`** — array of built-in starter programs; each has `days[]`, each day
+    a list of `"group:key"` item strings.
+  - **`MYROUTINES` / `DRAFT`** (runtime state, not config) — the user's saved custom
+    routines and the in-progress builder draft. Persist to `localStorage`
+    (`wf_routines` / `wf_draft`), gated by `canSave`. `DRAFT.items` and each saved
+    routine's `items` are filtered to `ALL` at load so the builder's index-based
+    move/remove stays aligned.
   - **`TIPS`** — array of gym-confidence tip strings.
   - **`ALL`** — a flat map built at load time: `ALL["group:key"]` → the exercise
     object (plus `group` / `groupTitle`). Used by routines, saving, and rendering.
@@ -186,6 +198,14 @@ the **Upper & side** focus.
     returns to the "pick a group" placeholder.
   - **`toggleEquipGroup(key)` / `equipPreset('free'|'all')`** — toggle an equipment
     category, or apply the Free-weights-only / All presets, then re-render.
+  - **`renderRoutinesTab()`** — renders the whole Routines tab: `renderBuilder()`
+    (the draft), `renderMyRoutines()` (saved customs), `renderRoutines()` (built-ins).
+  - **`toggleDraft(btn)`** — add/remove an exercise from the draft (the ＋ Routine
+    button). **`moveDraft` / `removeDraft` / `setDraftName` / `saveDraft` /
+    `clearDraft`** drive the builder; **`editRoutine` / `deleteRoutine`** manage saved
+    customs; **`saveCopyOfBuiltin(i)`** flattens a built-in into an editable copy.
+  - **`toggleRoutine(uid)`** — expand/collapse a routine; `uid` is `"b"+i` for
+    built-ins or the custom routine's `id`.
   - **`toggleVid(btn)`** — expands/collapses the inline player (one open at a
     time); works for both full cards and routine rows.
   - **`toggleSave(btn)` / `renderSaved()` / `persistSaved()`** — favorites +
@@ -231,9 +251,6 @@ list of `"group:key"` item strings that must exist in `DATA`).
 ## Roadmap (planned with Hannah, not yet built)
 Decided to allow a small `/assets` folder for images going forward (relaxing the
 strict single-file rule). Phased plan:
-- **Phase 2 — custom routine builder:** let her build & name her own routines from
-  exercises and save them to `localStorage` alongside the built-ins; favorite the
-  built-ins too.
 - **Phase 3 — machine guide (+ machine search):** a directory of common machines
   with descriptions, a photo (`/assets`), and a demo video; extends search to
   machines.
@@ -246,6 +263,8 @@ Smaller ideas: workout-of-the-day / randomized session; mark-as-done session
 logging; personalize (her name in the title).
 
 ### Done
+- **Phase 2:** custom routine builder — build/name/reorder/save your own routines
+  (localStorage), edit/delete them, and "Save a copy" of a built-in to edit.
 - **Phase 1:** global search, free-weights equipment grouping + presets, video
   thumbnails on cards (visual-first).
 - **v3:** equipment filter, sets/reps/cues/mistakes, focus sub-filters,

@@ -458,7 +458,23 @@
   .rm-new input:focus { outline: none; border-color: var(--accent); }
   .rm-done { width: 100%; }
 
-  /* ---- Tips ---- */
+  /* ---- Tips (rotating card on Exercises tab) ---- */
+  .tip-card {
+    background: var(--card); border: 1px solid var(--line);
+    border-left: 3px solid var(--good); border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 16px;
+  }
+  .tip-card-label {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--good); font-weight: 700; margin-bottom: 5px;
+  }
+  .tip-card-text { font-size: 0.88rem; line-height: 1.5; margin-bottom: 8px; }
+  .tip-card-next {
+    font-family: inherit; background: none; border: none; cursor: pointer;
+    font-size: 0.78rem; color: var(--text-dim); padding: 0; float: right;
+  }
+  .tip-card-next:active { color: var(--text); }
+
   .tip {
     background: var(--card); border: 1px solid var(--line);
     border-left: 3px solid var(--good); border-radius: 12px;
@@ -501,6 +517,11 @@
   <main>
     <!-- EXERCISES -->
     <section id="view-exercises" class="view on">
+      <div class="tip-card" id="tip-card">
+        <div class="tip-card-label">Tip</div>
+        <div class="tip-card-text" id="tip-card-text"></div>
+        <button class="tip-card-next" onclick="nextTip()">Next tip →</button>
+      </div>
       <div class="seg mode-seg" id="seg-mode">
         <button data-mode="exercises" class="on" onclick="setViewMode('exercises')">Exercises</button>
         <button data-mode="stretches" onclick="setViewMode('stretches')">Stretches</button>
@@ -597,7 +618,6 @@
     <button data-tab="routines" onclick="showTab('routines')"><span class="ico">▦</span><span class="lab">Routines</span></button>
     <button data-tab="machines" onclick="showTab('machines')"><span class="ico">⚙</span><span class="lab">Machines</span></button>
     <button data-tab="saved" onclick="showTab('saved')"><span class="ico">♥</span><span class="lab">Saved</span></button>
-    <button data-tab="tips" onclick="showTab('tips')"><span class="ico">★</span><span class="lab">Tips</span></button>
     <button data-tab="progress" onclick="showTab('progress')"><span class="ico">📈</span><span class="lab">Progress</span></button>
   </nav>
 
@@ -2467,8 +2487,13 @@
   }
 
   /* ---- Tips ---- */
-  function renderTips() {
-    document.getElementById("tips-list").innerHTML = TIPS.map(t => `<div class="tip">${esc(t)}</div>`).join("");
+  let tipIdx = Math.floor(Math.random() * TIPS.length);
+  function renderTipCard() {
+    document.getElementById("tip-card-text").textContent = TIPS[tipIdx];
+  }
+  function nextTip() {
+    tipIdx = (tipIdx + 1) % TIPS.length;
+    renderTipCard();
   }
 
   /* ---- Machine guide ---- */
@@ -2591,7 +2616,7 @@
     renderBodyMap();
     renderRoutinesTab();
     renderMachines();
-    renderTips();
+    renderTipCard();
     renderSaved();
   })();
 </script>

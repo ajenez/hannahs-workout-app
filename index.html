@@ -237,6 +237,122 @@
   .addr.on { color: var(--good); border-color: var(--good); background: #4dd0e11a; }
   .addr:active { transform: scale(0.98); }
 
+  /* ---- Workout log (inline on exercise card) ---- */
+  .log-btn {
+    flex: 1; font-family: inherit; cursor: pointer;
+    background: transparent; border: 1px solid #33414f; color: var(--text-dim);
+    font-weight: 600; font-size: 0.85rem; padding: 10px 14px; border-radius: 10px;
+  }
+  .log-btn.on { color: var(--good); border-color: var(--good); background: #4dd0e11a; }
+  .log-btn:active { transform: scale(0.98); }
+
+  .log-last {
+    font-size: 0.78rem; color: var(--text-dim); margin: 8px 0 0;
+  }
+  .log-last-val { color: var(--good); font-weight: 600; }
+
+  .log-panel {
+    display: none; margin-top: 12px; background: var(--bg-soft);
+    border: 1px solid var(--line); border-radius: 12px; padding: 14px;
+  }
+  .log-panel.open { display: block; }
+  .log-panel-hd {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+  }
+  .log-panel-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); }
+  .log-unit-seg { display: flex; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 2px; }
+  .log-unit-seg button {
+    border: none; background: none; color: var(--text-dim); font-family: inherit;
+    font-size: 0.72rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; cursor: pointer;
+  }
+  .log-unit-seg button.on { background: var(--good); color: #06222a; }
+  .log-form { display: flex; gap: 8px; align-items: flex-end; }
+  .log-field { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .log-field label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-dim); }
+  .log-field input {
+    width: 100%; font-family: inherit; font-size: 1rem; font-weight: 700;
+    background: var(--card); border: 1px solid var(--line); color: var(--text);
+    border-radius: 9px; padding: 9px 4px; text-align: center;
+  }
+  .log-field input:focus { outline: none; border-color: var(--good); }
+  .log-save {
+    flex: none; font-family: inherit; background: var(--good); color: #06222a;
+    border: none; border-radius: 9px; padding: 10px 18px; font-weight: 700;
+    font-size: 0.88rem; cursor: pointer;
+  }
+  .log-save:active { transform: scale(0.97); }
+  .log-confirm { font-size: 0.8rem; color: var(--good); text-align: center; margin-top: 8px; display: none; }
+  .log-confirm.show { display: block; }
+
+  /* ---- Progress tab ---- */
+  .prog-empty { color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; text-align: center; padding: 40px 16px; }
+  .prog-ex-block { margin-bottom: 28px; }
+  .prog-ex-head {
+    display: flex; align-items: baseline; gap: 8px;
+    padding: 12px 0 6px; border-bottom: 1px solid var(--line); margin-bottom: 8px;
+  }
+  .prog-ex-name { font-weight: 700; font-size: 0.95rem; flex: 1; }
+  .prog-ex-best { font-size: 0.78rem; color: var(--accent); font-weight: 600; white-space: nowrap; }
+  .prog-chart {
+    display: flex; align-items: flex-end; gap: 4px;
+    height: 52px; margin-bottom: 10px;
+  }
+  .prog-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; min-width: 0; }
+  .prog-bar {
+    width: 100%; border-radius: 4px 4px 0 0;
+    background: var(--accent); opacity: 0.75; transition: opacity 0.15s;
+  }
+  .prog-bar.peak { opacity: 1; }
+  .prog-bar-lbl { font-size: 0.6rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; text-align: center; }
+  .prog-entry {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 0; border-bottom: 1px solid #1e2733; font-size: 0.85rem;
+  }
+  .prog-entry-val { font-weight: 600; }
+  .prog-entry-date { color: var(--text-dim); font-size: 0.78rem; }
+
+  /* ---- Generate tab ---- */
+  .wod-splits { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .wod-split-chip {
+    font-family: inherit; cursor: pointer; font-size: 0.88rem; font-weight: 600;
+    background: transparent; border: 1px solid #33414f; color: var(--text-dim);
+    padding: 9px 16px; border-radius: 999px;
+  }
+  .wod-split-chip.on { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
+  .wod-split-chip:active { transform: scale(0.97); }
+  .wod-custom-label {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-dim); margin-bottom: 10px;
+  }
+  .wod-groups { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 20px; }
+  .wod-group-chip {
+    font-family: inherit; cursor: pointer; font-size: 0.82rem; font-weight: 600;
+    background: transparent; border: 1px solid #33414f; color: var(--text-dim);
+    padding: 7px 13px; border-radius: 999px;
+  }
+  .wod-group-chip.on { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
+  .wod-group-chip:active { transform: scale(0.97); }
+  .wod-gen-btn {
+    width: 100%; font-family: inherit; font-size: 1rem; font-weight: 700;
+    background: var(--accent); color: #06222a; border: none; border-radius: 12px;
+    padding: 14px; cursor: pointer; margin-bottom: 24px;
+  }
+  .wod-gen-btn:disabled { opacity: 0.35; cursor: default; }
+  .wod-gen-btn:not(:disabled):active { transform: scale(0.98); }
+  .wod-result-group-h {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--text-dim); margin: 20px 0 10px;
+  }
+  .wod-result-group-h:first-child { margin-top: 0; }
+  .wod-actions { display: flex; gap: 10px; margin-top: 20px; padding-bottom: 8px; }
+  .wod-action-btn {
+    flex: 1; font-family: inherit; font-size: 0.9rem; font-weight: 700;
+    border-radius: 12px; padding: 13px; cursor: pointer;
+    border: 1px solid var(--accent); background: transparent; color: var(--accent);
+  }
+  .wod-action-btn.primary { background: var(--accent); color: #06222a; }
+  .wod-action-btn:active { transform: scale(0.97); }
+
   /* inline video */
   .player { display: none; margin-top: 8px; }
   .player.open { display: block; }
@@ -427,6 +543,20 @@
     </section>
 
     <!-- MACHINES -->
+    <!-- GENERATE -->
+    <section id="view-generate" class="view">
+      <h2 class="view-title">Generate</h2>
+      <p class="view-sub">Pick a split and get a ready-to-go workout.</p>
+      <div class="wod-splits" id="wod-splits"></div>
+      <div id="wod-custom">
+        <div class="wod-custom-label">Pick muscle groups</div>
+        <div class="wod-groups" id="wod-groups"></div>
+      </div>
+      <button class="wod-gen-btn" id="wod-gen-btn" onclick="generateWorkout()">Generate Workout</button>
+      <div id="wod-result"></div>
+      <div class="wod-actions" id="wod-actions"></div>
+    </section>
+
     <section id="view-machines" class="view">
       <h2 class="view-title">Machine guide</h2>
       <p class="view-sub">What the common machines do and how to set them up — no guessing.</p>
@@ -451,15 +581,24 @@
       <div id="tips-list"></div>
     </section>
 
+    <!-- PROGRESS -->
+    <section id="view-progress" class="view">
+      <h2 class="view-title">Progress</h2>
+      <p class="view-sub">Your logged workouts, so you always know what to beat.</p>
+      <div id="progress-list"></div>
+    </section>
+
     <footer>Always warm up first &amp; start lighter than you think. Tap “Watch demo” for proper form.</footer>
   </main>
 
   <nav class="tabbar">
     <button data-tab="exercises" class="on" onclick="showTab('exercises')"><span class="ico">≡</span><span class="lab">Exercises</span></button>
+    <button data-tab="generate" onclick="showTab('generate')"><span class="ico">⚡</span><span class="lab">Generate</span></button>
     <button data-tab="routines" onclick="showTab('routines')"><span class="ico">▦</span><span class="lab">Routines</span></button>
     <button data-tab="machines" onclick="showTab('machines')"><span class="ico">⚙</span><span class="lab">Machines</span></button>
     <button data-tab="saved" onclick="showTab('saved')"><span class="ico">♥</span><span class="lab">Saved</span></button>
     <button data-tab="tips" onclick="showTab('tips')"><span class="ico">★</span><span class="lab">Tips</span></button>
+    <button data-tab="progress" onclick="showTab('progress')"><span class="ico">📈</span><span class="lab">Progress</span></button>
   </nav>
 
   <!-- Add-to-routine popup menu (opened from an exercise card's ＋ Routine button) -->
@@ -1591,6 +1730,288 @@
   function persistRoutines() { if (!canSave) return; try { localStorage.setItem("wf_routines", JSON.stringify(MYROUTINES)); } catch (e) {} }
   function newRoutineId() { return "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
+  /* ---- Workout logs (localStorage) ---- */
+  let UNIT = "kg";
+  let LOGS = [];
+  try {
+    UNIT = localStorage.getItem("wf_unit") || "kg";
+    const raw = JSON.parse(localStorage.getItem("wf_logs") || "[]");
+    if (Array.isArray(raw)) LOGS = raw;
+  } catch (e) {}
+  function persistLogs() { if (!canSave) return; try { localStorage.setItem("wf_logs", JSON.stringify(LOGS)); } catch (e) {} }
+  function setUnit(u) {
+    UNIT = u;
+    if (canSave) try { localStorage.setItem("wf_unit", u); } catch (e) {}
+    document.querySelectorAll(".log-unit-seg button").forEach(b => b.classList.toggle("on", b.dataset.unit === u));
+    document.querySelectorAll(".log-weight-lbl").forEach(el => el.textContent = "Weight (" + u + ")");
+  }
+  function lastLog(exId) {
+    for (let i = LOGS.length - 1; i >= 0; i--) { if (LOGS[i].exId === exId) return LOGS[i]; }
+    return null;
+  }
+  function logMode(e) {
+    if (/\d+s/i.test(e.reps)) return "time";
+    if (e.equip.every(eq => eq === "Bodyweight")) return "bw";
+    return "weight";
+  }
+  function timeAgo(dateStr) {
+    const d = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+    return d === 0 ? "today" : d === 1 ? "yesterday" : d + " days ago";
+  }
+  function lastLineHTML(exId, e) {
+    const last = lastLog(exId);
+    if (!last) return "";
+    const mode = logMode(e);
+    let val = mode === "time" ? `${last.reps}s × ${last.sets} sets`
+            : mode === "bw"   ? `${last.reps} reps × ${last.sets} sets`
+            :                   `${last.weight}${last.unit} × ${last.reps} reps × ${last.sets} sets`;
+    return `<div class="log-last" data-exid="${esc(exId)}">Last: <span class="log-last-val">${esc(val)}</span> · ${timeAgo(last.date)}</div>`;
+  }
+  function logPanelHTML(id, e) {
+    const mode = logMode(e);
+    const last = lastLog(id);
+    const sid = id.replace(/[^a-z0-9]/g, "-");
+    const defSets = last ? last.sets : (parseInt(e.sets) || 3);
+    const defReps = last ? last.reps : (parseInt(e.reps.match(/\d+/)?.[0] || "10") || 10);
+    const defWeight = last ? last.weight : "";
+    const weightField = mode === "weight" ? `
+      <div class="log-field">
+        <label class="log-weight-lbl">Weight (${UNIT})</label>
+        <input type="number" min="0" max="999" step="0.5" inputmode="decimal" class="log-weight" value="${esc(String(defWeight))}">
+      </div>` : "";
+    const repsField = `
+      <div class="log-field">
+        <label>${mode === "time" ? "Seconds" : "Reps"}</label>
+        <input type="number" min="1" max="999" inputmode="numeric" class="log-reps" value="${esc(String(defReps))}">
+      </div>`;
+    const setsField = `
+      <div class="log-field">
+        <label>Sets</label>
+        <input type="number" min="1" max="30" inputmode="numeric" class="log-sets" value="${esc(String(defSets))}">
+      </div>`;
+    const unitToggle = mode === "weight"
+      ? `<div class="log-unit-seg">
+          <button data-unit="kg" class="${UNIT === "kg" ? "on" : ""}" onclick="setUnit('kg')">kg</button>
+          <button data-unit="lb" class="${UNIT === "lb" ? "on" : ""}" onclick="setUnit('lb')">lb</button>
+        </div>` : "";
+    return `<div class="log-panel" id="lp-${sid}">
+      <div class="log-panel-hd"><span class="log-panel-title">Log workout</span>${unitToggle}</div>
+      <div class="log-form">${weightField}${repsField}${setsField}
+        <button class="log-save" onclick="saveLog('${esc(id)}',this)">Save</button>
+      </div>
+      <div class="log-confirm" id="lp-conf-${sid}">Logged!</div>
+    </div>`;
+  }
+  function openLogPanel(btn) {
+    const exId = btn.dataset.id;
+    const sid = exId.replace(/[^a-z0-9]/g, "-");
+    const panel = document.getElementById("lp-" + sid);
+    if (!panel) return;
+    const isOpen = panel.classList.contains("open");
+    document.querySelectorAll(".log-panel.open").forEach(p => p.classList.remove("open"));
+    document.querySelectorAll(".log-btn.on").forEach(b => b.classList.remove("on"));
+    if (!isOpen) {
+      panel.classList.add("open");
+      btn.classList.add("on");
+      panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }
+  function saveLog(exId, saveBtn) {
+    const e = ALL[exId]; if (!e) return;
+    const sid = exId.replace(/[^a-z0-9]/g, "-");
+    const panel = document.getElementById("lp-" + sid);
+    const mode = logMode(e);
+    const reps = parseInt(panel.querySelector(".log-reps").value) || 0;
+    const sets = parseInt(panel.querySelector(".log-sets").value) || 1;
+    const weight = mode === "weight" ? (parseFloat(panel.querySelector(".log-weight").value) || 0) : null;
+    LOGS.push({ id: Date.now().toString(36), exId, date: new Date().toISOString(), weight, reps, sets, unit: UNIT });
+    persistLogs();
+    const conf = document.getElementById("lp-conf-" + sid);
+    if (conf) { conf.classList.add("show"); setTimeout(() => conf.classList.remove("show"), 1500); }
+    const last = lastLog(exId);
+    const val = mode === "time" ? `${last.reps}s × ${last.sets} sets`
+              : mode === "bw"   ? `${last.reps} reps × ${last.sets} sets`
+              :                   `${last.weight}${last.unit} × ${last.reps} reps × ${last.sets} sets`;
+    document.querySelectorAll(`.log-last[data-exid="${exId}"]`).forEach(el => {
+      el.innerHTML = `Last: <span class="log-last-val">${esc(val)}</span> · today`;
+    });
+    if (currentTab === "progress") renderProgress();
+  }
+  function renderProgress() {
+    const wrap = document.getElementById("progress-list");
+    if (!LOGS.length) {
+      wrap.innerHTML = `<div class="prog-empty">No workouts logged yet.<br>Tap <strong>✎ Log</strong> on any exercise card to record your sets.</div>`;
+      return;
+    }
+    const byEx = {};
+    LOGS.forEach(l => { (byEx[l.exId] = byEx[l.exId] || []).push(l); });
+    // most recently logged exercise first
+    const exIds = Object.keys(byEx).sort((a, b) => {
+      const la = byEx[a], lb = byEx[b];
+      return new Date(lb[lb.length-1].date) - new Date(la[la.length-1].date);
+    });
+    wrap.innerHTML = exIds.map(exId => {
+      const e = ALL[exId]; if (!e) return "";
+      // oldest→newest for chart (time progresses left→right)
+      const entries = byEx[exId].slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+      const mode = logMode(e);
+
+      // metric value for chart height + best callout
+      const metricOf = l => mode === "weight" ? (l.weight || 0) : l.reps;
+      const unitLabel = mode === "weight" ? (entries[entries.length-1]?.unit || UNIT)
+                      : mode === "time"   ? "s" : "reps";
+      const metrics = entries.map(metricOf);
+      const maxMetric = Math.max(...metrics) || 1;
+      const bestIdx = metrics.indexOf(maxMetric);
+      const bestEntry = entries[bestIdx];
+      const bestStr = mode === "time"   ? `${bestEntry.reps}s × ${bestEntry.sets} sets`
+                    : mode === "bw"     ? `${bestEntry.reps} reps × ${bestEntry.sets} sets`
+                    :                    `${bestEntry.weight}${bestEntry.unit} × ${bestEntry.reps} reps × ${bestEntry.sets} sets`;
+
+      // bar chart (only render if >1 session — single bar is pointless)
+      const chart = entries.length > 1 ? `<div class="prog-chart">${
+        entries.map((l, i) => {
+          const h = Math.max(4, Math.round((metricOf(l) / maxMetric) * 48));
+          const isPeak = i === bestIdx;
+          const lbl = mode === "weight" ? `${l.weight}${unitLabel}` : `${metricOf(l)}${unitLabel}`;
+          return `<div class="prog-bar-wrap">
+            <div class="prog-bar${isPeak ? " peak" : ""}" style="height:${h}px"></div>
+            <div class="prog-bar-lbl">${esc(lbl)}</div>
+          </div>`;
+        }).join("")
+      }</div>` : "";
+
+      const rows = entries.slice().reverse().map(l => { // newest first in list
+        const val = mode === "time" ? `${l.reps}s × ${l.sets} sets`
+                  : mode === "bw"   ? `${l.reps} reps × ${l.sets} sets`
+                  :                   `${l.weight}${l.unit} × ${l.reps} reps × ${l.sets} sets`;
+        return `<div class="prog-entry">
+          <span class="prog-entry-val">${esc(val)}</span>
+          <span class="prog-entry-date">${timeAgo(l.date)}</span>
+        </div>`;
+      }).join("");
+
+      return `<div class="prog-ex-block">
+        <div class="prog-ex-head">
+          <span class="prog-ex-name">${esc(e.name)}</span>
+          <span class="prog-ex-best">Best: ${esc(bestStr)}</span>
+        </div>
+        ${chart}${rows}
+      </div>`;
+    }).join("");
+  }
+
+  /* ---- Generate tab ---- */
+  const WOD_SPLITS = [
+    { key:"fullbody", label:"Full Body", groups:["chest","back","shoulders","core","quads","hamstrings","glutes"] },
+    { key:"push",     label:"Push",      groups:["chest","shoulders","triceps"] },
+    { key:"pull",     label:"Pull",      groups:["back","biceps"] },
+    { key:"legs",     label:"Legs",      groups:["quads","hamstrings","glutes","calves"] },
+    { key:"upper",    label:"Upper",     groups:["chest","shoulders","back","biceps","triceps"] },
+    { key:"lower",    label:"Lower",     groups:["quads","hamstrings","glutes","calves","lowerback"] },
+    { key:"custom",   label:"Custom",    groups:[] },
+  ];
+  const WOD_ALL_GROUPS = REGIONS.flatMap(r => r.groups);
+
+  let wodSplit = null;
+  let wodCustomGroups = [];
+  let wodResult = [];
+
+  function renderGenerateTab() {
+    document.getElementById("wod-splits").innerHTML = WOD_SPLITS.map(s =>
+      `<button class="wod-split-chip${wodSplit === s.key ? " on" : ""}" onclick="selectWodSplit('${s.key}')">${esc(s.label)}</button>`
+    ).join("");
+
+    const customEl = document.getElementById("wod-custom");
+    customEl.style.display = wodSplit === "custom" ? "" : "none";
+    if (wodSplit === "custom") {
+      document.getElementById("wod-groups").innerHTML = WOD_ALL_GROUPS.map(g =>
+        `<button class="wod-group-chip${wodCustomGroups.includes(g) ? " on" : ""}" onclick="toggleWodGroup('${g}')">${esc(DATA[g].title)}</button>`
+      ).join("");
+    }
+
+    const canGenerate = wodSplit !== null && (wodSplit !== "custom" || wodCustomGroups.length > 0);
+    document.getElementById("wod-gen-btn").disabled = !canGenerate;
+
+    renderWodResult();
+  }
+
+  function selectWodSplit(key) {
+    wodSplit = key;
+    if (key !== "custom") wodCustomGroups = [];
+    wodResult = [];
+    renderGenerateTab();
+  }
+
+  function toggleWodGroup(g) {
+    const i = wodCustomGroups.indexOf(g);
+    if (i === -1) wodCustomGroups.push(g);
+    else wodCustomGroups.splice(i, 1);
+    wodResult = [];
+    renderGenerateTab();
+  }
+
+  function generateWorkout() {
+    const split = WOD_SPLITS.find(s => s.key === wodSplit);
+    if (!split) return;
+    const groups = split.key === "custom" ? wodCustomGroups : split.groups;
+    const seen = new Set();
+    const result = [];
+
+    for (const group of groups) {
+      const candidates = Object.keys(ALL)
+        .filter(id => id.startsWith(group + ":") && ALL[id].equip.some(x => activeEquip.has(x)) && !seen.has(id));
+      // Fisher-Yates shuffle
+      for (let i = candidates.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+      }
+      const picks = candidates.slice(0, 2);
+      picks.forEach(id => seen.add(id));
+      result.push(...picks);
+    }
+
+    wodResult = result;
+    renderWodResult();
+    document.getElementById("wod-result").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function renderWodResult() {
+    const resultEl = document.getElementById("wod-result");
+    const actionsEl = document.getElementById("wod-actions");
+
+    if (!wodResult.length) {
+      resultEl.innerHTML = "";
+      actionsEl.innerHTML = "";
+      return;
+    }
+
+    const split = WOD_SPLITS.find(s => s.key === wodSplit);
+    const groups = split?.key === "custom" ? wodCustomGroups : (split?.groups || []);
+
+    let html = "";
+    for (const group of groups) {
+      const ids = wodResult.filter(id => id.startsWith(group + ":"));
+      if (!ids.length) continue;
+      html += `<div class="wod-result-group-h">${esc(DATA[group].title)}</div>`;
+      html += ids.map(id => cardHTML(id)).join("");
+    }
+    resultEl.innerHTML = html;
+
+    actionsEl.innerHTML = `
+      <button class="wod-action-btn" onclick="generateWorkout()">↺ Regenerate</button>
+      <button class="wod-action-btn primary" onclick="saveWodAsRoutine()">Save as Routine</button>`;
+  }
+
+  function saveWodAsRoutine() {
+    if (!wodResult.length) return;
+    const split = WOD_SPLITS.find(s => s.key === wodSplit);
+    const name = split?.key === "custom" ? "Custom Workout" : `${split.label} Workout`;
+    MYROUTINES.unshift({ id: newRoutineId(), name, items: [...wodResult] });
+    persistRoutines();
+    showTab("routines");
+  }
+
   /* ---- Add-to-routine popup menu (opened from an exercise card) ---- */
   let menuExId = null;
   function openRoutineMenu(btn) {
@@ -1692,6 +2113,7 @@
             <div><b>${esc(e.reps)}</b><span>reps</span></div>
             <div><b>${esc(e.rest)}</b><span>rest</span></div>
           </div>
+          ${lastLineHTML(id, e)}
           <div class="block"><div class="block-h">Form cues</div><ul class="cues">${cues}</ul></div>
           <div class="block"><div class="block-h warn">Common mistakes</div><ul class="mistakes">${mistakes}</ul></div>
           <div class="pills">
@@ -1701,7 +2123,9 @@
           <div class="actions">
             <button class="save ${saved ? "on" : ""}" onclick="toggleSave(this)" data-id="${id}">${saved ? "♥ Saved" : "♡ Save"}</button>
             <button class="addr" onclick="openRoutineMenu(this)" data-id="${id}">＋ Routine</button>
+            <button class="log-btn" onclick="openLogPanel(this)" data-id="${id}">✎ Log</button>
           </div>
+          ${logPanelHTML(id, e)}
         </div>
         <div class="player"></div>
       </div>`;
@@ -2134,6 +2558,8 @@
     document.querySelectorAll(".tabbar button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
     if (t === "saved") renderSaved();
     if (t === "routines") renderRoutinesTab();
+    if (t === "progress") renderProgress();
+    if (t === "generate") renderGenerateTab();
     window.scrollTo(0, 0);
   }
 

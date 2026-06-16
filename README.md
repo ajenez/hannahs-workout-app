@@ -295,10 +295,21 @@ list of `"group:key"` item strings that must exist in `DATA`).
 ---
 
 ## Roadmap
-All four planned phases are built. Smaller ideas still open: workout-of-the-day /
-randomized session; mark-as-done session logging.
+All planned phases are built. Smaller ideas still open: personalization (remember
+preferred body type, default equipment filter).
 
 ### Done
+- **Generate tab — workout generator:** a ⚡ Generate tab where you pick a named
+  split (Full Body, Push, Pull, Legs, Upper, Lower) or Custom (multi-select any
+  muscle groups), then tap "Generate Workout" to get a randomized 2-exercises-per-
+  group workout respecting the active equipment filter. Results show full exercise
+  cards with cues, video, Save, Log, and +Routine. Regenerate reshuffles; "Save as
+  Routine" pushes the result straight into your custom routines.
+- **Progress tab — workout logging:** a ✎ Log button on every exercise card opens
+  an inline panel (adaptive: weight+reps / reps-only / time depending on the
+  exercise). Logs persist to `localStorage`. The 📈 Progress tab shows each
+  logged exercise with a personal-best callout, a div-based bar chart
+  (oldest→newest, peak bar highlighted), and a newest-first session list.
 - **Stretching:** a Stretches mode on the Exercises tab (warm-up/cool-down stretches
   per muscle, all 13 groups), stretches savable (Saved has All/Exercises/Stretches),
   and every routine auto-shows warm-up + cool-down blocks paired from the muscles it

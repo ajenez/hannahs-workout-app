@@ -102,23 +102,76 @@ def boxseeds(b, s=10):
     x0, y0, x1, y1 = b
     return [(x, y) for x in range(x0, x1+1, s) for y in range(y0, y1+1, s)]
 
+# Muscles that split into focus sub-zones (an approximate spatial cut of the muscle mask).
+# These map to the FOCUS chips in the app; the line art doesn't draw the divisions.
+SPLITS = {
+    "glutes": ("h", 0.45, "medius", "overall"),  # upper part ≈ gluteus medius (upper & side)
+    "core":   ("h", 0.50, "upper", "lower"),      # rectus abdominis split top/bottom
+    "back":   ("v", None, "lats", "mid"),         # outer = lats, inner (spine side) = mid-back
+}
+
+def split_h(mask, frac, top_f, bot_f):
+    ys, _ = np.where(mask > 0)
+    if not len(ys): return []
+    y0, y1 = int(ys.min()), int(ys.max()); cut = int(y0 + frac * (y1 - y0))
+    top = mask.copy(); top[cut:, :] = 0
+    bot = mask.copy(); bot[:cut, :] = 0
+    return [(top_f, top), (bot_f, bot)]
+
+def split_v_lat(mask):
+    _, xs = np.where(mask > 0)
+    if not len(xs): return []
+    x0, x1 = int(xs.min()), int(xs.max()); cut = (x0 + x1) // 2; cx = (x0 + x1) / 2
+    a = mask.copy(); a[:, cut:] = 0   # left half
+    b = mask.copy(); b[:, :cut] = 0   # right half
+    # outer (away from the spine at x=250) = "lats"; inner = "mid"
+    return [("lats", a), ("mid", b)] if cx < 250 else [("mid", a), ("lats", b)]
+
+# The art doesn't draw obliques, so the abs "obliques" focus uses hand-placed waist
+# strips (lateral to the rectus shield), clipped to the body. Front view only.
+OBLIQUE_POLYS = {
+    "female-front": [[(196,295),(214,300),(214,410),(204,420),(190,375),(191,330)],
+                     [(304,295),(286,300),(286,410),(296,420),(310,375),(309,330)]],
+    "male-front":   [[(192,305),(210,310),(210,420),(199,430),(186,385),(187,340)],
+                     [(308,305),(290,310),(290,420),(301,430),(314,385),(313,340)]],
+}
+
 def main():
     os.makedirs(CHECKS, exist_ok=True)
     result = {}
+    subresult = {}
     for name, specs in SPECS.items():
         im = Image.open(os.path.join(ASSETS, f"{name}.png")).convert("RGBA")
         pm = passable_mask(im); h, w = pm.shape
         polys = []
+        subzones = []  # (group, focus, pts)
         clickable = np.zeros((h, w), np.uint8)
         for g, seeds, is_box in specs:
             sds = boxseeds(seeds) if is_box else seeds
             reg = flood_region(pm, sds, do_nudge=(not is_box))
             clickable = np.maximum(clickable, reg)
+            cl = 19 if g == "core" else 0
             # `core` spans several drawn ab segments — close the gaps so it traces as one region
-            pts = contour_points(reg, close=(19 if g == "core" else 0))
+            pts = contour_points(reg, close=cl)
             if pts: polys.append((g, pts))
             else: print("  WARNING empty region:", name, g)
+            # split into focus sub-zones (approximate spatial cut of this muscle's mask)
+            if g in SPLITS:
+                kind = SPLITS[g][0]
+                parts = split_h(reg, SPLITS[g][1], SPLITS[g][2], SPLITS[g][3]) if kind == "h" else split_v_lat(reg)
+                for f, sub in parts:
+                    sp = contour_points(sub, close=cl)
+                    if sp: subzones.append((g, f, sp))
+        # approximate oblique sub-zones for abs (hand-placed waist strips, clipped to the body)
+        bodymask = (np.array(im)[:, :, 3] > 120).astype(np.uint8)
+        for poly in OBLIQUE_POLYS.get(name, []):
+            m = np.zeros((h, w), np.uint8)
+            cv2.fillPoly(m, [np.array(poly, np.int32)], 1)
+            m = m & bodymask
+            sp = contour_points(m)
+            if sp: subzones.append(("core", "obliques", sp))
         result[name] = polys
+        subresult[name] = subzones
         # Dim every light body-fill pixel that isn't part of a clickable muscle, so only
         # tappable muscles read as light. Idempotent: dimmed pixels are no longer "passable".
         arr = np.array(im)
@@ -138,15 +191,36 @@ def main():
 
     def block_for(key):
         return "\n".join(f'        {{ g:"{g}", p:"{" ".join(f"{x},{y}" for x,y in pts)}" }},' for g, pts in result[key])
-    block = ("  const HOTSPOTS = {\n    female: {\n      front: [\n" + block_for("female-front") +
-             "\n      ],\n      back: [\n" + block_for("female-back") + "\n      ],\n    },\n    male: {\n      front: [\n" +
-             block_for("male-front") + "\n      ],\n      back: [\n" + block_for("male-back") + "\n      ],\n    },\n  };")
+    hotspots = ("  const HOTSPOTS = {\n    female: {\n      front: [\n" + block_for("female-front") +
+                "\n      ],\n      back: [\n" + block_for("female-back") + "\n      ],\n    },\n    male: {\n      front: [\n" +
+                block_for("male-front") + "\n      ],\n      back: [\n" + block_for("male-back") + "\n      ],\n    },\n  };")
+
+    # SUBZONES[group][type][view] = [{ f, p }]
+    nested = {}
+    for name, subs in subresult.items():
+        type_, view = name.split("-")
+        for g, f, pts in subs:
+            nested.setdefault(g, {}).setdefault(type_, {}).setdefault(view, []).append((f, pts))
+    sub_lines = ["  const SUBZONES = {"]
+    for g, types in nested.items():
+        sub_lines.append(f"    {g}: {{")
+        for type_, views in types.items():
+            sub_lines.append(f"      {type_}: {{")
+            for view, items in views.items():
+                rows = "".join(f'\n          {{ f:"{f}", p:"{" ".join(f"{x},{y}" for x,y in pts)}" }},' for f, pts in items)
+                sub_lines.append(f"        {view}: [{rows}\n        ],")
+            sub_lines.append("      },")
+        sub_lines.append("    },")
+    sub_lines.append("  };")
+    MARK = "/* end body-map data */"
+    block = hotspots + "\n\n" + "\n".join(sub_lines) + "\n  " + MARK
+
     idx = os.path.join(ROOT, "index.html")
     html = open(idx).read()
     start = html.index("  const HOTSPOTS = {")
-    end = html.index("\n  };", start) + len("\n  };")
+    end = (html.index(MARK, start) + len(MARK)) if MARK in html[start:] else (html.index("\n  };", start) + len("\n  };"))
     open(idx, "w").write(html[:start] + block + html[end:])
-    print("Rewrote HOTSPOTS in index.html. Verification overlays in scripts/_checks/.")
+    print("Rewrote HOTSPOTS + SUBZONES in index.html. Verification overlays in scripts/_checks/.")
 
 if __name__ == "__main__":
     main()

@@ -89,6 +89,7 @@
   /* ---- Body map (clickable muscle picker) ---- */
   .bodymap-wrap { margin: 2px 0 18px; }
   .bodymap-toggles { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .mode-seg { width: fit-content; margin: 4px auto 14px; }
   .seg { display: flex; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
   .seg button {
     border: none; background: none; color: var(--text-dim); font-family: inherit;
@@ -102,6 +103,11 @@
   .hot { fill: transparent; stroke: transparent; cursor: pointer; transition: fill 0.15s; }
   .hot.hov { fill: rgba(255,90,95,0.25); }
   .hot.sel { fill: rgba(255,90,95,0.42); stroke: var(--accent); stroke-width: 2.5; }
+  /* sub-zones of a selected splittable muscle. Inactive = faint + dashed ("tap a
+     section"); active (the whole muscle when focus=all, or the chosen section) = filled. */
+  .hot.sub { fill: rgba(255,90,95,0.10); stroke: var(--accent); stroke-width: 1.2; stroke-dasharray: 4 3; }
+  .hot.sub.hov { fill: rgba(255,90,95,0.32); }
+  .hot.sub.sel { fill: rgba(255,90,95,0.45); stroke: var(--accent); stroke-width: 2; stroke-dasharray: none; }
   .bodymap-hint { text-align: center; color: var(--text-dim); font-size: 0.8rem; margin-top: 10px; }
 
   /* ---- Muscle chips by region ---- */
@@ -154,6 +160,8 @@
   .lvl.beg { color: var(--beg); background: var(--beg-soft); }
   .lvl.int { color: var(--int); background: var(--int-soft); }
   .lvl.machine { color: var(--good); background: #4dd0e11a; }
+  .lvl.warm { color: var(--int); background: var(--int-soft); }
+  .lvl.cool { color: var(--good); background: #4dd0e11a; }
   .card-desc { color: var(--text-dim); font-size: 0.86rem; line-height: 1.45; }
 
   /* video thumbnail preview (visual-first) */
@@ -259,6 +267,7 @@
     font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.5px;
     color: var(--good); margin: 14px 0 8px;
   }
+  .day-h.pair-h { color: var(--accent); }
   .rrow {
     background: var(--card); border: 1px solid var(--line); border-radius: 10px;
     padding: 10px 12px; margin-bottom: 8px;
@@ -375,6 +384,10 @@
   <main>
     <!-- EXERCISES -->
     <section id="view-exercises" class="view on">
+      <div class="seg mode-seg" id="seg-mode">
+        <button data-mode="exercises" class="on" onclick="setViewMode('exercises')">Exercises</button>
+        <button data-mode="stretches" onclick="setViewMode('stretches')">Stretches</button>
+      </div>
       <div class="bodymap-wrap">
         <div class="bodymap-toggles">
           <div class="seg" id="seg-body">
@@ -392,7 +405,7 @@
       <div class="searchbar">
         <input id="search" type="search" autocomplete="off" placeholder="Search exercises, muscles, equipment…" oninput="runSearch(this.value)">
       </div>
-      <div class="filterbar">
+      <div class="filterbar" id="filterbar">
         <div class="filter-h">Equipment</div>
         <div class="equip-chips" id="equip-chips"></div>
       </div>
@@ -421,7 +434,12 @@
 
     <!-- SAVED -->
     <section id="view-saved" class="view">
-      <h2 class="view-title">Saved exercises</h2>
+      <h2 class="view-title">Saved</h2>
+      <div class="seg mode-seg" id="seg-saved">
+        <button data-sv="all" class="on" onclick="setSavedView('all')">All</button>
+        <button data-sv="exercises" onclick="setSavedView('exercises')">Exercises</button>
+        <button data-sv="stretches" onclick="setSavedView('stretches')">Stretches</button>
+      </div>
       <div id="saved-list"></div>
     </section>
 
@@ -500,6 +518,30 @@
           cues:["Keep a soft bend in the elbows the whole time","Bring the handles together in front of your chest","Squeeze, then return slowly"],
           mistakes:["Bending and straightening the elbows (that's a press)","Going so heavy you twist your torso"],
           secondary:["Front delts"] },
+        { key:"decline", name:"Decline Dumbbell Press", level:"Beginner", yt:"k9CzXmJcJNw",
+          equip:["Dumbbells"], gear:"Dumbbells + decline bench", sets:3, reps:"8–12", rest:"90s",
+          desc:"Hits the lower chest — pairs well with the incline press.",
+          cues:["Set the bench to a decline, feet secured","Lower dumbbells to lower chest, elbows at 45°","Press up and slightly together"],
+          mistakes:["Flaring the elbows wide","Letting the dumbbells drift toward the upper chest"],
+          secondary:["Front delts","Triceps"] },
+        { key:"pecdeck", name:"Pec Deck Fly", level:"Beginner", yt:"hZ0CGRaKwbQ",
+          equip:["Machines"], gear:"Pec deck / chest fly machine", sets:3, reps:"12–15", rest:"60s",
+          desc:"Machine fly — isolates the chest with a guided arc.",
+          cues:["Seat height so handles line up with mid-chest","Push the pads together in a wide hugging arc","Control the return — don't let it snap back"],
+          mistakes:["Letting the shoulders roll forward","Going so heavy the movement becomes a press"],
+          secondary:["Front delts"] },
+        { key:"crossover", name:"Cable Crossover", level:"Intermediate", yt:"taI4XduLpTk",
+          equip:["Cables"], gear:"Dual cable machine, handles at high setting", sets:3, reps:"12–15", rest:"45s",
+          desc:"Wide sweeping fly that gives a deep stretch at the top of every rep.",
+          cues:["Cables set high, step forward, soft bend in the elbows","Sweep the hands together and slightly down — like hugging a barrel","Squeeze at the bottom, controlled return"],
+          mistakes:["Crossing the hands too aggressively","Bending the elbows so it becomes a press"],
+          secondary:["Front delts"] },
+        { key:"pullover", name:"Dumbbell Pullover", level:"Intermediate", yt:"moKuOuFNBDM",
+          equip:["Dumbbells"], gear:"One dumbbell + flat bench", sets:3, reps:"10–12", rest:"60s",
+          desc:"Stretches the chest and lats through a big arc — unusual but effective.",
+          cues:["Lie along the bench, hold one dumbbell overhead with both hands","Lower the dumbbell back behind your head in an arc, soft elbow bend","Bring it back over your chest"],
+          mistakes:["Bending the elbows too much — shifts the work to triceps","Going so far back it stresses the shoulder joint"],
+          secondary:["Back","Triceps"] },
       ]
     },
     back: {
@@ -535,6 +577,24 @@
           cues:["Pick enough assistance to do clean reps","Start from a full hang, pull your chest toward the bar","Lower slowly — the lowering is what builds strength"],
           mistakes:["So much assist you bounce off the bottom","Only doing half reps"],
           secondary:["Biceps","Core"] },
+        { key:"csrow", name:"Chest-Supported DB Row", level:"Beginner", yt:"vmX58YYK3-8",
+          equip:["Dumbbells"], gear:"Incline bench + two dumbbells", sets:3, reps:"10–12", rest:"60s",
+          desc:"Your chest on the bench means zero cheating — pure back work.",
+          cues:["Set the bench to a low incline, lie face down, chest on the pad","Row both dumbbells toward your hips, elbows close","Squeeze the shoulder blades, lower fully"],
+          mistakes:["Lifting your chest off the pad to use momentum","Flaring the elbows out to the sides"],
+          secondary:["Biceps","Rear delts"] },
+        { key:"sapulldown", name:"Straight-Arm Pulldown", level:"Intermediate", yt:"mvgQs3CkgGQ",
+          equip:["Cables"], gear:"Cable + bar or rope, set high", sets:3, reps:"12–15", rest:"45s",
+          desc:"Pure lat isolation — arms stay straight the whole time.",
+          cues:["Stand back from the machine, slight forward lean","Arms straight, pull the bar down to your thighs in a wide arc","Control back up, feel the lats stretch at the top"],
+          mistakes:["Bending the elbows — that changes it to a lat pulldown","Using momentum by swinging the torso"],
+          secondary:["Core"] },
+        { key:"tbarrow", name:"T-Bar Row", level:"Intermediate", yt:"j3Igk5nyZE4",
+          equip:["Barbell"], gear:"Landmine attachment or T-bar station", sets:3, reps:"8–10", rest:"90s",
+          desc:"Heavy back-builder — the angle lets you load more than a dumbbell row.",
+          cues:["Feet either side of the bar, hinge forward","Pull the handle to your chest, lead with your elbows","Squeeze the shoulder blades at the top, lower under control"],
+          mistakes:["Rounding the lower back to heave the weight","Very upright stance so it becomes a shrug"],
+          secondary:["Biceps","Rear delts","Lower back"] },
       ]
     },
     shoulders: {
@@ -623,6 +683,24 @@
           cues:["Shoulder-width grip, elbows at your sides","Curl the bar up, keep your wrists neutral","Lower under control"],
           mistakes:["Swinging the bar with your hips","Flaring the elbows out"],
           secondary:["Forearms"] },
+        { key:"inclinecurl", name:"Incline Dumbbell Curl", level:"Intermediate", yt:"soxrZlIl35U",
+          equip:["Dumbbells"], gear:"Incline bench + two dumbbells", sets:3, reps:"10–12", rest:"60s",
+          desc:"The incline angle stretches the bicep at the bottom — more tension than a standing curl.",
+          cues:["Set bench to ~60°, sit back with a dumbbell in each hand","Arms hang behind your body — don't swing them forward","Curl up, elbows stay still"],
+          mistakes:["Lifting your elbows forward to cheat the range","Going so heavy the shoulder takes over"],
+          secondary:["Forearms"] },
+        { key:"concentrationcurl", name:"Concentration Curl", level:"Beginner", yt:"ZcU2hN76UyA",
+          equip:["Dumbbells"], gear:"One dumbbell", sets:3, reps:"10–12 each", rest:"45s",
+          desc:"Elbow braced on your thigh — nowhere to cheat, maximum bicep focus.",
+          cues:["Sit on a bench, elbow on the inside of your thigh","Curl slowly, squeeze hard at the top","Lower all the way for a full stretch"],
+          mistakes:["Moving the elbow off the thigh","Swinging the upper arm to get the weight up"],
+          secondary:[] },
+        { key:"preachercurl", name:"Preacher Curl", level:"Beginner", yt:"BPmUhDtdQfw",
+          equip:["Machines","Dumbbells"], gear:"Preacher bench or machine", sets:3, reps:"10–12", rest:"60s",
+          desc:"The pad locks your upper arms in place — almost impossible to cheat.",
+          cues:["Drape your upper arms over the pad, armpits at the top","Curl the weight up, stop just before vertical","Lower slowly — full stretch at the bottom"],
+          mistakes:["Letting the elbows flare off the pad","Bouncing out of the bottom"],
+          secondary:["Forearms"] },
       ]
     },
     triceps: {
@@ -651,6 +729,30 @@
           desc:"A push-up with hands close — shifts the work to the triceps.",
           cues:["Hands under your chest, narrower than a normal push-up","Keep your elbows tucked toward your body","Straight line head to heels"],
           mistakes:["Flaring the elbows out","Letting your hips sag"],
+          secondary:["Chest","Front delts"] },
+        { key:"skull", name:"Skull Crushers", level:"Intermediate", yt:"QXzhjRnYRT0",
+          equip:["Barbell","Dumbbells"], gear:"EZ-bar or dumbbells + flat bench", sets:3, reps:"10–12", rest:"60s",
+          desc:"The long-head tricep builder — lowering behind the head stretches it fully.",
+          cues:["Lie on a bench, arms vertical over your chest","Hinge only at the elbows, lower the bar toward your forehead or just behind","Press back up, elbows stay pointed at the ceiling"],
+          mistakes:["Flaring the elbows out to the sides","Losing control and dropping the weight"],
+          secondary:[] },
+        { key:"kickback", name:"Tricep Kickback", level:"Beginner", yt:"m9me06UBPKc",
+          equip:["Dumbbells"], gear:"One dumbbell + bench for support", sets:3, reps:"12–15 each", rest:"45s",
+          desc:"Isolation move — straightening the arm squeezes the tricep hard at the top.",
+          cues:["Hinge forward, upper arm parallel to the floor","Kick the dumbbell back until your arm is straight","Hold the squeeze for a beat, lower slowly"],
+          mistakes:["Upper arm dropping — keep it glued to your side","Using momentum to swing the dumbbell"],
+          secondary:[] },
+        { key:"cableoverhead", name:"Cable Overhead Extension", level:"Intermediate", yt:"GzmlxvSFE7A",
+          equip:["Cables"], gear:"Cable + rope, set low", sets:3, reps:"12–15", rest:"45s",
+          desc:"Cable stays taut through the whole rep — more consistent tension than dumbbells.",
+          cues:["Grab the rope, face away from the machine","Hands behind your head, elbows pointing up","Extend your arms overhead, elbows staying in"],
+          mistakes:["Elbows flaring wide","Leaning forward so the low back takes strain"],
+          secondary:[] },
+        { key:"diamondpushup", name:"Diamond Push-up", level:"Intermediate", yt:"_6AvEX9-k8E",
+          equip:["Bodyweight"], gear:"None", sets:3, reps:"8–12", rest:"60s",
+          desc:"Hands form a diamond shape under your chest — a tough bodyweight tricep move.",
+          cues:["Index fingers and thumbs touching in a diamond under your chest","Elbows stay close to your body throughout","Lower your chest toward the diamond, press back up"],
+          mistakes:["Hips sagging or piking up","Rushing so fast you lose the tricep tension"],
           secondary:["Chest","Front delts"] },
       ]
     },
@@ -681,6 +783,18 @@
           cues:["Stand tall, shoulders back, brace your core","Walk with controlled steps","Grip hard — that's the point"],
           mistakes:["Leaning to one side","Letting your shoulders round forward"],
           secondary:["Forearms","Core"] },
+        { key:"uprightrow", name:"Upright Row", level:"Intermediate", yt:"K0dYqPCaO14",
+          equip:["Dumbbells","Barbell"], gear:"Dumbbells or barbell", sets:3, reps:"10–12", rest:"60s",
+          desc:"Pulls to chin height — hits upper traps and side delts together.",
+          cues:["Narrow grip (hands close), pull the weight straight up","Lead with your elbows up and out to the sides","Stop when elbows reach shoulder height, lower slowly"],
+          mistakes:["Grip too wide — shifts it mainly to the deltoids","Going heavy and letting elbows drift behind you (hard on the shoulder)"],
+          secondary:["Shoulders"] },
+        { key:"cableshrug", name:"Cable Shrug", level:"Beginner", yt:"ipwwB1LglGY",
+          equip:["Cables"], gear:"Cable machine, two handles or a bar", sets:3, reps:"12–15", rest:"45s",
+          desc:"Constant cable tension gives a harder squeeze at the top than dumbbell shrugs.",
+          cues:["One cable each side (or bar in front)","Shrug straight up toward your ears","Hold the top for a beat, lower under control"],
+          mistakes:["Rolling the shoulders (no benefit, some risk)","Bending the elbows to help heave the weight up"],
+          secondary:[] },
       ]
     },
     forearms: {
@@ -704,6 +818,24 @@
           cues:["Stand tall, shoulders back, brace your core","Walk with controlled steps","Grip hard the whole way"],
           mistakes:["Leaning to one side","Letting your shoulders round forward"],
           secondary:["Traps","Core"] },
+        { key:"deadhang", name:"Dead Hang", level:"Beginner", yt:"2vspW4N4BMs",
+          equip:["Bodyweight"], gear:"Pull-up bar", sets:3, reps:"20–40s", rest:"60s",
+          desc:"Just hang from the bar — builds grip endurance and decompresses the spine.",
+          cues:["Full hang, arms completely straight","Slight shoulder blade engagement — don't let the traps shrug up to your ears","Breathe steadily and hold"],
+          mistakes:["Fully passive hang with zero shoulder engagement","Holding your breath"],
+          secondary:["Back","Shoulders"] },
+        { key:"wristroller", name:"Wrist Roller", level:"Intermediate", yt:"gUYXMoBpT8o",
+          equip:["Dumbbells"], gear:"Wrist roller (or DIY dowel + rope + weight plate)", sets:3, reps:"2–3 full rolls", rest:"60s",
+          desc:"Winding and unwinding a weight up a rope torches both sides of the forearm.",
+          cues:["Arms extended in front at shoulder height","Roll the handle to wind the rope up, then unwind it back down","Control the descent — the lowering is where the burn is"],
+          mistakes:["Dropping the arms partway through","Rushing so you lose control of the weight"],
+          secondary:[] },
+        { key:"revwristcurl", name:"Reverse Wrist Curl", level:"Beginner", yt:"SfENsl5klVA",
+          equip:["Dumbbells"], gear:"Light dumbbells", sets:3, reps:"15–20", rest:"45s",
+          desc:"Palms-down wrist curl — trains the forearm extensors that protect the elbow.",
+          cues:["Forearms on your thighs, palms facing down","Lift the backs of your hands upward at the wrist","Lower slowly, short controlled range"],
+          mistakes:["Going heavy — these muscles fatigue fast","Letting the wrists flop all the way down"],
+          secondary:[] },
       ]
     },
 
@@ -753,6 +885,36 @@
           cues:["Hang with a tight grip, shoulders engaged","Raise your knees toward your chest by curling your hips","Lower slowly — don't swing"],
           mistakes:["Swinging back and forth to fling the knees up","Only bending the knees without curling the hips"],
           secondary:["Forearms"] },
+        { key:"deadbug", name:"Dead Bug", level:"Beginner", yt:"4XLEnwUr1d8",
+          equip:["Bodyweight"], gear:"None (a mat helps)", sets:3, reps:"10 each side", rest:"45s",
+          desc:"Looks simple, trains the deep core hard — also great for lower back health.",
+          cues:["Lie on your back, arms pointing up, knees at 90° over your hips","Lower opposite arm and leg toward the floor — press your lower back down","Return slowly and switch sides"],
+          mistakes:["Letting your lower back arch off the floor","Moving too fast to maintain control"],
+          secondary:["Lower back"] },
+        { key:"abwheel", name:"Ab Wheel Rollout", level:"Intermediate", yt:"9ZCoAbI7uX0",
+          equip:["Bodyweight"], gear:"Ab wheel (or barbell with plates)", sets:3, reps:"8–10", rest:"60s",
+          desc:"One of the hardest core exercises — start from your knees until you're strong.",
+          cues:["Kneel on a mat, wheel in front","Roll forward keeping a hollow body — don't let your hips drop","Pull back with your core and lats to return"],
+          mistakes:["Hips sagging the moment you roll out","Rolling so far that the lower back takes over"],
+          secondary:["Lower back","Shoulders"] },
+        { key:"cablecrunch", name:"Cable Crunch", level:"Beginner", yt:"AV5PmZJIrrw",
+          equip:["Cables"], gear:"Cable + rope at high setting", sets:3, reps:"12–15", rest:"45s",
+          desc:"Weighted crunch with constant cable tension — easy to add load progressively.",
+          cues:["Kneel, rope at your ears","Crunch your rib cage toward your hips — not your head toward your knees","Slow return, keep tension on the cable throughout"],
+          mistakes:["Pulling with the arms and neck instead of curling the abs","Sitting up so far you lose tension at the top"],
+          secondary:[] },
+        { key:"sideplank", name:"Side Plank", level:"Beginner", yt:"iNbH7_edNI8",
+          equip:["Bodyweight"], gear:"None (a mat helps)", sets:3, reps:"20–40s each side", rest:"45s",
+          desc:"The best oblique stability exercise — hold a straight line from head to feet.",
+          cues:["Forearm under your shoulder, feet stacked or staggered","Lift your hips to form a straight line, squeeze your core","Don't let the hips sag or rotate"],
+          mistakes:["Hips dropping toward the floor","Rotating the torso to compensate for weak obliques"],
+          secondary:["Shoulders"] },
+        { key:"mountainclimber", name:"Mountain Climber", level:"Beginner", yt:"ZhiCSdOVJp0",
+          equip:["Bodyweight"], gear:"None", sets:3, reps:"20 total (10 each leg)", rest:"30s",
+          desc:"Drives the knees toward the chest from a plank — cardio and core in one.",
+          cues:["Start in a plank, hands under your shoulders","Drive one knee toward your chest, quickly switch legs","Keep your hips level — don't let them bounce up"],
+          mistakes:["Hips rising so it becomes a piked position","Going so fast the core engagement disappears"],
+          secondary:["Shoulders"] },
       ]
     },
     lowerback: {
@@ -782,6 +944,30 @@
           cues:["Soft knees, push your hips back","Slide the weight down your legs, back flat","Feel the hamstring stretch, then drive your hips forward"],
           mistakes:["Rounding the back","Squatting it down instead of hinging"],
           secondary:["Hamstrings","Glutes"] },
+        { key:"deadlift", name:"Deadlift", level:"Intermediate", yt:"oN8VgSgnhNk",
+          equip:["Barbell","Dumbbells"], gear:"Barbell (or heavy dumbbells to learn)", sets:3, reps:"5–8", rest:"120s",
+          desc:"The king of the back chain — trains the entire posterior from traps to calves.",
+          cues:["Feet hip-width, bar over mid-foot, grip just outside your legs","Chest up, press the floor away — the bar stays against your legs","Hips and shoulders rise together, lock out tall at the top"],
+          mistakes:["Rounding the lower back under load","Jerking the bar off the floor instead of a smooth drive"],
+          secondary:["Hamstrings","Glutes","Traps","Core"] },
+        { key:"goodmorning", name:"Good Morning", level:"Intermediate", yt:"vKPGe8zb2S4",
+          equip:["Barbell","Dumbbells"], gear:"Barbell (or hold a dumbbell at your chest)", sets:3, reps:"8–12", rest:"90s",
+          desc:"A hip hinge with load — teaches the lower back and hamstrings to work together.",
+          cues:["Bar on your upper traps (or hold a dumbbell at your chest)","Soft knees, hinge forward until your torso is nearly parallel to the floor","Drive your hips forward to stand, keep the back flat throughout"],
+          mistakes:["Rounding the back — this is the one exercise where that truly matters","Adding weight before the pattern is solid"],
+          secondary:["Hamstrings","Glutes"] },
+        { key:"kbswing", name:"Kettlebell Swing", level:"Intermediate", yt:"bDCeXbMJVNs",
+          equip:["Dumbbells"], gear:"Kettlebell (or dumbbell)", sets:3, reps:"15–20", rest:"60s",
+          desc:"Explosive hip hinge — trains power and cardio at the same time.",
+          cues:["Hip-width stance, hike the bell back between your legs","Drive your hips forward explosively — the bell swings to chest height","Snap the hips, not the lower back"],
+          mistakes:["Squatting the swing instead of hinging","Using the arms to lift the bell rather than letting the hips drive it"],
+          secondary:["Glutes","Hamstrings","Core"] },
+        { key:"slrdl", name:"Single-Leg Romanian Deadlift", level:"Intermediate", yt:"Zfr6wizR8rs",
+          equip:["Dumbbells","Bodyweight"], gear:"One or two dumbbells", sets:3, reps:"8–10 each", rest:"75s",
+          desc:"A balance challenge that builds each side independently — great for athletes.",
+          cues:["Stand on one leg, slight bend in the knee","Hinge forward, opposite leg extends behind, weight hangs down","Feel the hamstring stretch, then drive through the standing heel to stand"],
+          mistakes:["Rotating the hips open as you hinge","Bending the standing knee too much so it becomes a squat"],
+          secondary:["Hamstrings","Glutes","Core"] },
       ]
     },
 
@@ -884,6 +1070,30 @@
           cues:["Step forward into a long stride","Drop the back knee toward the floor","Push through the front heel to the next step"],
           mistakes:["Short steps that push the knee past the toes","Leaning your torso forward"],
           secondary:["Glutes","Hamstrings"] },
+        { key:"backsquat", name:"Barbell Back Squat", level:"Intermediate", yt:"8PMjqgR8Wa8",
+          equip:["Barbell"], gear:"Barbell + squat rack", sets:4, reps:"6–10", rest:"120s",
+          desc:"The big compound lift for the quads — start with an empty bar to learn the pattern.",
+          cues:["Bar on your upper traps, feet shoulder-width, toes slightly out","Sit down and back, chest up","Push through your whole foot to stand, knees track over toes"],
+          mistakes:["Knees caving in under load","Heels lifting — work on ankle mobility if this happens"],
+          secondary:["Glutes","Hamstrings","Core"] },
+        { key:"stepup", name:"Dumbbell Step-Up", level:"Beginner", yt:"DxUNi119Qzs",
+          equip:["Dumbbells","Bodyweight"], gear:"Box or bench + optional dumbbells", sets:3, reps:"10–12 each", rest:"60s",
+          desc:"Simple and effective — builds each leg individually with great carryover to daily life.",
+          cues:["Step onto the box with one foot, fully flat","Drive through the top heel to stand up straight","Lower the trailing leg under control"],
+          mistakes:["Using the trailing leg to push off the floor","Leaning too far forward over the working leg"],
+          secondary:["Glutes","Hamstrings"] },
+        { key:"hacksquat", name:"Hack Squat Machine", level:"Beginner", yt:"-lAnEGH2blE",
+          equip:["Machines"], gear:"Hack squat machine", sets:3, reps:"10–12", rest:"90s",
+          desc:"Fixed-path squat machine — easier to learn than a barbell squat and very quad-focused.",
+          cues:["Shoulders against the pads, feet shoulder-width on the plate","Lower until thighs are parallel or just below","Press through your heels, keep your back against the pad"],
+          mistakes:["Feet too low so the knees shoot far forward","Cutting depth short so only the top of the quad works"],
+          secondary:["Glutes","Hamstrings"] },
+        { key:"reverselunge", name:"Reverse Lunge", level:"Beginner", yt:"xrPteyQLGAo",
+          equip:["Bodyweight","Dumbbells"], gear:"Bodyweight or dumbbells", sets:3, reps:"10–12 each", rest:"60s",
+          desc:"Stepping back is easier on the knees than a forward lunge — a great starting point.",
+          cues:["Stand tall, step one foot back into a long stance","Drop the back knee toward the floor, front knee over the ankle","Push through the front heel to return"],
+          mistakes:["Short back step so the front knee drifts forward","Leaning the torso forward"],
+          secondary:["Glutes","Hamstrings"] },
       ]
     },
     hamstrings: {
@@ -907,6 +1117,24 @@
           cues:["Heels a bit further out than a normal glute bridge","Dig your heels in and lift your hips","Think about curling your heels toward you"],
           mistakes:["Pushing through your toes","Arching the lower back"],
           secondary:["Glutes"] },
+        { key:"lyingcurl", name:"Lying Leg Curl", level:"Beginner", yt:"i6m3Vp9H40Y",
+          equip:["Machines"], gear:"Lying leg curl machine", sets:3, reps:"12–15", rest:"60s",
+          desc:"Lying version of the leg curl — full stretch at the bottom every rep.",
+          cues:["Lie face down, pad on your lower calves","Curl your heels toward your glutes, squeeze at the top","Lower slowly — the stretch is where the gains happen"],
+          mistakes:["Lifting your hips off the pad to get more range","Slamming the weight down on the return"],
+          secondary:["Calves"] },
+        { key:"nordic", name:"Nordic Hamstring Curl", level:"Intermediate", yt:"_e9vFU9-tkc",
+          equip:["Bodyweight"], gear:"Anchor for your feet (a bar, lat machine, or a partner)", sets:3, reps:"4–8", rest:"90s",
+          desc:"The hardest bodyweight hamstring exercise — also the best for injury prevention.",
+          cues:["Kneel with feet anchored, body upright","Lower your body toward the floor as slowly as possible","Use your hands to push back up at the bottom"],
+          mistakes:["Dropping too fast — slow lowering is the whole point","Starting with too many reps — 4–6 slow negatives is plenty"],
+          secondary:["Glutes","Calves"] },
+        { key:"slrdl", name:"Single-Leg Romanian Deadlift", level:"Intermediate", yt:"Zfr6wizR8rs",
+          equip:["Dumbbells","Bodyweight"], gear:"One or two dumbbells", sets:3, reps:"8–10 each", rest:"75s",
+          desc:"Unilateral hinge that builds each hamstring separately and challenges balance.",
+          cues:["Stand on one leg, slight bend in the knee","Hinge forward, opposite leg extends behind, weight hangs down","Drive through the standing heel to return"],
+          mistakes:["Rotating the hips open as you hinge","Bending the standing knee too much"],
+          secondary:["Glutes","Lower back","Core"] },
       ]
     },
     calves: {
@@ -930,6 +1158,30 @@
           cues:["Feet low on the platform, balls of the feet only","Press the platform away by pointing your toes","Control it back for a stretch"],
           mistakes:["Bending the knees to push (that's a leg press)","Tiny bouncy reps"],
           secondary:[] },
+        { key:"singlelegcalf", name:"Single-Leg Calf Raise", level:"Intermediate", yt:"td7TMmbV8wI",
+          equip:["Bodyweight"], gear:"A step (optional for more range)", sets:3, reps:"12–15 each", rest:"45s",
+          desc:"Double the work per calf and addresses side-to-side imbalances.",
+          cues:["Stand on one foot (hold a wall for balance)","Rise onto your toes as high as possible","Lower slowly for a full stretch at the bottom"],
+          mistakes:["Cutting the range short at the bottom","Bouncing through reps"],
+          secondary:[] },
+        { key:"donkey", name:"Donkey Calf Raise", level:"Intermediate", yt:"Jk_fDd57e98",
+          equip:["Machines","Bodyweight"], gear:"Donkey calf raise machine (or hinge over a box/bench)", sets:3, reps:"15–20", rest:"45s",
+          desc:"Hips bent 90° changes the angle — many people feel this variation more strongly.",
+          cues:["Hinge forward at the hips, toes on the edge","Rise onto your toes as high as you can","Lower slowly for a full stretch at the bottom"],
+          mistakes:["Straightening the hips — that becomes a standing calf raise","Cutting the range short at the bottom"],
+          secondary:[] },
+        { key:"jumprope", name:"Jump Rope", level:"Beginner", yt:"FNV7di0x2gY",
+          equip:["Bodyweight"], gear:"A jump rope", sets:3, reps:"60–90s", rest:"60s",
+          desc:"Classic conditioning that hammers the calves and elevates your heart rate.",
+          cues:["Stay on the balls of your feet, light and springy","Keep the jumps small — just enough clearance for the rope","Wrists do the turning, not your whole arms"],
+          mistakes:["Landing heel-first (hard on the ankles)","Giant jumps that slow the rhythm down"],
+          secondary:["Core"] },
+        { key:"boxjump", name:"Box Jump", level:"Intermediate", yt:"G-bxQY57mKc",
+          equip:["Bodyweight"], gear:"A plyometric box or sturdy step", sets:3, reps:"6–8", rest:"90s",
+          desc:"Explosive jump that trains calf and leg power — great carryover to sport.",
+          cues:["Stand in front of the box, small squat then swing your arms","Jump and land softly with bent knees — absorb the impact","Step back down rather than jumping off"],
+          mistakes:["Landing stiff-legged — that's where ankle and knee injuries happen","Starting on a box that's too high"],
+          secondary:["Quads","Glutes"] },
       ]
     },
   };
@@ -966,9 +1218,11 @@
                  hipabd:"medius", cableabd:"medius", bandwalk:"medius", clamshell:"medius", curtsy:"medius" },
     shoulders: { dbpress:"front", front:"front", arnold:"front", lateral:"side", cablelat:"side",
                  machinelat:"side", facepull:"rear", reverfly:"rear", pecdeck:"rear" },
-    back:      { latpulldown:"lats", pullup:"lats", cablerow:"mid", dbrow:"mid", onearmrow:"mid" },
-    core:      { crunch:"upper", plank:"upper", legraise:"lower", revcrunch:"lower", hangraise:"lower",
-                 bicycle:"obliques", twist:"obliques" },
+    back:      { latpulldown:"lats", pullup:"lats", sapulldown:"lats",
+                 cablerow:"mid", dbrow:"mid", onearmrow:"mid", csrow:"mid", tbarrow:"mid" },
+    core:      { crunch:"upper", plank:"upper", deadbug:"upper", abwheel:"upper", cablecrunch:"upper",
+                 legraise:"lower", revcrunch:"lower", hangraise:"lower",
+                 bicycle:"obliques", twist:"obliques", sideplank:"obliques", mountainclimber:"obliques" },
   };
 
   /* ---- Starter routines (reference exercises by "group:key") ---- */
@@ -1040,6 +1294,115 @@
     { name:"Smith Machine", group:null, yt:"fH-hrxExhwI",
       trains:"Squats, presses and more on a fixed barbell path.",
       how:["The bar runs on rails, so it won't tip — great for learning","Twist the bar to unrack it, and to rack it at any height","Set the safety stops just below your range as a backstop","Stand so the fixed path matches the lift you're doing"] },
+  ];
+
+  /* ---- Stretch library ----
+     Flat list; each stretch covers one or more muscle `groups` (so it surfaces under
+     every relevant muscle and pairs to any workout hitting those muscles). `type` is
+     "dynamic" (warm-up, before) or "static" (cool-down, after). `hold` replaces
+     sets/reps. `key` is unique; saved as "stretch:<key>". yt = oEmbed-verified ID. */
+  const STRETCHES = [
+    // dynamic warm-ups
+    { key:"arm-circles", name:"Arm Circles", type:"dynamic", yt:"P3dzI9opLGE", hold:"10 each way",
+      groups:["shoulders","chest","biceps","triceps"], desc:"Loosen the shoulders before pressing or pulling.",
+      cues:["Arms straight out to the sides","Small circles, gradually bigger","Reverse direction halfway"] },
+    { key:"shoulder-rolls", name:"Shoulder Rolls", type:"dynamic", yt:"X7NtgY9kCCM", hold:"10 each way",
+      groups:["traps","shoulders"], desc:"Warms up the traps and shoulders.",
+      cues:["Roll your shoulders up, back, and down","Big, slow circles","Keep your neck relaxed"] },
+    { key:"cat-cow", name:"Cat-Cow", type:"dynamic", yt:"xyNwxiuERXc", hold:"8–10 reps",
+      groups:["lowerback","back","core"], desc:"Wakes up the spine and core before training.",
+      cues:["On all fours, hands under shoulders","Inhale: arch and look up","Exhale: round your back, tuck your chin"] },
+    { key:"torso-twists", name:"Standing Torso Twists", type:"dynamic", yt:"f4Qah0bQTIo", hold:"10 each side",
+      groups:["core","lowerback","back"], desc:"Loosens the core and lower back.",
+      cues:["Feet shoulder-width, knees soft","Rotate from the ribs side to side","Let your arms swing naturally"] },
+    { key:"leg-swings", name:"Leg Swings", type:"dynamic", yt:"BwsqxJxk7cM", hold:"10 each leg",
+      groups:["hamstrings","glutes","quads"], desc:"Opens the hips and warms the legs.",
+      cues:["Hold a wall for balance","Swing one leg forward and back","Controlled, with growing range"] },
+    { key:"wrist-circles", name:"Wrist Circles", type:"dynamic", yt:"IJvS9bYl_cs", hold:"10 each way",
+      groups:["forearms"], desc:"Preps the wrists and forearms for gripping.",
+      cues:["Extend your arms in front","Circle the wrists slowly","Reverse direction"] },
+    { key:"ankle-circles", name:"Ankle Circles", type:"dynamic", yt:"RI4BJd1oKCI", hold:"10 each way",
+      groups:["calves"], desc:"Warms the ankles and calves.",
+      cues:["Lift one foot off the floor","Draw slow circles with your toes","Both directions, then switch"] },
+    // static cool-downs
+    { key:"doorway-chest", name:"Doorway Chest Stretch", type:"static", yt:"Y6aYNh4TM0k", hold:"30s each",
+      groups:["chest","shoulders"], desc:"Opens the chest after pressing work.",
+      cues:["Forearm on the door frame, elbow ~90°","Step through gently","Feel it across the chest"] },
+    { key:"crossbody-shoulder", name:"Cross-Body Shoulder Stretch", type:"static", yt:"pD236y4-YRc", hold:"30s each",
+      groups:["shoulders"], desc:"Releases the back of the shoulder.",
+      cues:["Bring one arm across your chest","Pull it in with the other arm","Keep the shoulder down"] },
+    { key:"overhead-triceps", name:"Overhead Triceps Stretch", type:"static", yt:"nbHOmIYMazk", hold:"30s each",
+      groups:["triceps","back"], desc:"Lengthens the triceps and lats.",
+      cues:["Reach one hand down your back","Gently press the elbow with the other hand","Keep your ribs down"] },
+    { key:"standing-biceps", name:"Standing Biceps Stretch", type:"static", yt:"u8KplvVTrI8", hold:"30s each",
+      groups:["biceps"], desc:"Stretches the biceps after curls.",
+      cues:["Arm out to the side, palm forward on a wall","Turn your body away gently","Feel it along the upper arm"] },
+    { key:"upper-trap", name:"Upper Trap & Neck Stretch", type:"static", yt:"DwCIZ4YSyd4", hold:"30s each",
+      groups:["traps"], desc:"Eases neck and upper-trap tension.",
+      cues:["Gently tilt your ear toward your shoulder","Light hand assist — no yanking","Keep the other shoulder down"] },
+    { key:"wrist-stretch", name:"Wrist Flexor & Extensor Stretch", type:"static", yt:"rQlDHgTUbO0", hold:"30s each",
+      groups:["forearms"], desc:"Relieves the forearms and wrists.",
+      cues:["Arm out, palm down — gently bend the wrist down","Then palm up — bend it back","Hold each side"] },
+    { key:"childs-pose", name:"Child's Pose", type:"static", yt:"_ZX_zTOBgp8", hold:"30–60s",
+      groups:["back","shoulders","lowerback"], desc:"Decompresses the back and lats.",
+      cues:["Kneel and sit back toward your heels","Reach your arms forward","Let your back relax"] },
+    { key:"cobra", name:"Cobra Stretch", type:"static", yt:"JDcdhTuycOI", hold:"20–30s",
+      groups:["core","lowerback"], desc:"Stretches the abs and opens the front.",
+      cues:["Lie face down, hands under shoulders","Press up, keep your hips down","Stop if your lower back pinches"] },
+    { key:"figure-four", name:"Figure-Four Glute Stretch", type:"static", yt:"8rT3E85omQ4", hold:"30s each",
+      groups:["glutes","lowerback"], desc:"Releases the glutes and hips.",
+      cues:["On your back, cross one ankle over the opposite knee","Pull the back thigh toward you","Keep your head down"] },
+    { key:"standing-quad", name:"Standing Quad Stretch", type:"static", yt:"kzAsm4WQqvQ", hold:"30s each",
+      groups:["quads"], desc:"Stretches the front of the thigh.",
+      cues:["Hold a wall for balance","Pull one heel toward your glute","Knees together, hips pushed forward"] },
+    { key:"standing-hamstring", name:"Standing Hamstring Stretch", type:"static", yt:"9ESpoUPqpFw", hold:"30s each",
+      groups:["hamstrings","calves"], desc:"Lengthens the hamstrings.",
+      cues:["Heel on the floor, toes up","Hinge at the hips, back flat","Feel it down the back of the leg"] },
+    { key:"wall-calf", name:"Wall Calf Stretch", type:"static", yt:"YTYQo4WvJHA", hold:"30s each",
+      groups:["calves"], desc:"Stretches the calf and ankle.",
+      cues:["Hands on the wall, one foot back","Back heel down, that leg straight","Lean in until the calf stretches"] },
+    { key:"pigeon-pose", name:"Pigeon Pose", type:"static", yt:"4kO98sUdmBc", hold:"45–60s each",
+      groups:["glutes","lowerback"], desc:"Deep glute and hip stretch — one of the best after lower-body sessions.",
+      cues:["Front leg bent at 90°, rear leg extended behind you","Sink your hips toward the floor","Walk your hands forward to deepen the stretch"] },
+    { key:"90-90-hip", name:"90/90 Hip Stretch", type:"static", yt:"t4Zz6-aG8Iw", hold:"45s each side",
+      groups:["glutes","hamstrings"], desc:"Sits both hips at 90° — a deep, functional glute and hip release.",
+      cues:["Sit with both legs bent at 90°, one in front and one to the side","Sit tall and gently lean over the front shin","Switch which leg is in front and repeat"] },
+    { key:"couch-stretch", name:"Couch Stretch", type:"static", yt:"WKo4APrwfXQ", hold:"45–60s each",
+      groups:["quads","lowerback"], desc:"One of the best quad and hip-flexor stretches — great after squats or sitting all day.",
+      cues:["Back foot up on a bench or wall, front foot forward","Tall torso, squeeze your glute on the back leg","Sink your hips toward the floor"] },
+    { key:"kneeling-hip-flexor", name:"Kneeling Hip Flexor Stretch", type:"static", yt:"6o-GpPIGR5w", hold:"30s each",
+      groups:["quads","lowerback"], desc:"Classic lunge-position stretch for the hip flexors and front of the thigh.",
+      cues:["Kneel on one knee, front foot forward","Shift your weight forward until you feel a stretch in the rear hip","Keep your torso upright, brace your core lightly"] },
+    { key:"seated-forward-fold", name:"Seated Forward Fold", type:"static", yt:"oJX8EKF3TqM", hold:"30–60s",
+      groups:["hamstrings","lowerback"], desc:"Hamstring stretch you can do anywhere — just a mat and a wall if needed.",
+      cues:["Sit tall, legs straight in front","Hinge at the hips and reach forward (not the head toward the knees)","Keep a flat back as long as you can before letting it round"] },
+    { key:"supine-hamstring", name:"Supine Hamstring Stretch", type:"static", yt:"Gt0vqmdKhqU", hold:"30s each",
+      groups:["hamstrings"], desc:"Lying down keeps the hips level — easier to isolate one hamstring at a time.",
+      cues:["Lie on your back, lift one leg toward the ceiling","Hold behind the thigh or calf (not the knee)","Keep the other leg flat on the floor"] },
+    { key:"downward-dog", name:"Downward Dog", type:"static", yt:"eu0Pt5ODfRg", hold:"30–45s",
+      groups:["hamstrings","calves","lowerback"], desc:"Stretches the calves, hamstrings and back all at once — a great full-chain stretch.",
+      cues:["Hands and feet on the floor, hips pushed up and back","Heels pressing toward the floor (they don't need to touch)","Alternate bending one knee then the other to warm each calf"] },
+    { key:"knees-to-chest", name:"Knees to Chest", type:"static", yt:"nzBIEtLAUSQ", hold:"30–60s",
+      groups:["lowerback"], desc:"Gentle lower back release — feels great after deadlifts, squats, or sitting.",
+      cues:["Lie on your back, pull both knees toward your chest","Wrap your arms around your shins","Rock gently side to side for extra release"] },
+    { key:"seated-spinal-twist", name:"Seated Spinal Twist", type:"static", yt:"r5JuFoNzOU8", hold:"30s each",
+      groups:["core","back","lowerback"], desc:"Rotational stretch for the spine, obliques and lats.",
+      cues:["Sit tall on the floor, one leg extended, other foot flat outside the knee","Rotate toward the bent knee, use the opposite elbow as a lever","Keep growing taller with each exhale"] },
+    { key:"standing-side-stretch", name:"Standing Side Stretch", type:"static", yt:"gOlXrhOXq6E", hold:"30s each",
+      groups:["core"], desc:"Lengthens the obliques and lats along the side of the body.",
+      cues:["Stand tall, reach one arm overhead","Lean to the opposite side in a smooth arc","Keep both feet flat and hips square"] },
+    { key:"levator-scapulae", name:"Levator Scapulae Stretch", type:"static", yt:"GSoXPJRnR6E", hold:"30s each",
+      groups:["traps","shoulders"], desc:"Targets the muscle that runs from the neck to the shoulder blade — relieves the classic desk-neck.",
+      cues:["Tilt your head forward and to one side at about 45°","Place the same-side hand on top of your head for a gentle assist","Keep the opposite shoulder down"] },
+    { key:"overhead-lat-stretch", name:"Overhead Lat Stretch", type:"static", yt:"OX5NZLkidtY", hold:"30s each",
+      groups:["back","shoulders"], desc:"Reaches overhead to lengthen the lats and the side of the back.",
+      cues:["Stand or kneel, reach both arms overhead","Lean to one side to bias that lat","Keep your ribs down — don't arch the lower back"] },
+    { key:"sleeper-stretch", name:"Sleeper Stretch", type:"static", yt:"9BN8bRVq3Xo", hold:"30s each",
+      groups:["shoulders"], desc:"Improves shoulder internal rotation — important after a lot of pressing work.",
+      cues:["Lie on your side, shoulder directly below you, arm pointing forward at 90°","Use your other hand to gently rotate the forearm toward the floor","Stop before you feel any pinching in the shoulder"] },
+    { key:"crossbody-tricep-stretch", name:"Cross-Body Triceps Stretch", type:"static", yt:"QusGDSLCcKQ", hold:"30s each",
+      groups:["triceps"], desc:"Brings the arm across the chest to stretch the triceps through its full length.",
+      cues:["Bring one arm across your chest at shoulder height","Use the opposite hand to hold it above the elbow","Keep the shoulder down, don't shrug it up"] },
   ];
 
   /* ---- Body-map hotspots ----
@@ -1115,6 +1478,64 @@
     },
   };
 
+  const SUBZONES = {
+    core: {
+      female: {
+        front: [
+          { f:"upper", p:"221,254 216,259 220,333 279,333 283,259 262,247 237,247" },
+          { f:"lower", p:"220,338 222,368 229,395 242,419 250,425 263,410 273,386 278,338" },
+          { f:"obliques", p:"199,298 193,329 192,371 198,369 204,362 209,343 209,319 212,302" },
+          { f:"obliques", p:"301,298 288,302 290,344 295,362 300,368 308,372 307,329" },
+        ],
+      },
+      male: {
+        front: [
+          { f:"upper", p:"216,261 211,266 216,340 283,340 286,263 263,253 236,253" },
+          { f:"lower", p:"216,345 219,380 226,403 239,425 250,434 263,421 275,398 281,375 283,345" },
+          { f:"obliques", p:"195,308 189,339 189,385 194,383 201,374 206,356 204,336 206,311" },
+          { f:"obliques", p:"305,308 293,312 295,326 293,355 298,374 304,382 311,386 311,339" },
+        ],
+      },
+    },
+    back: {
+      female: {
+        back: [
+          { f:"lats", p:"202,177 174,198 197,299 197,325 188,346 202,344" },
+          { f:"mid", p:"207,174 207,344 214,313 237,278 232,240 218,192" },
+          { f:"mid", p:"291,175 280,195 262,266 263,282 284,311 291,344" },
+          { f:"lats", p:"296,176 296,344 311,346 302,325 302,297 325,199" },
+        ],
+      },
+      male: {
+        back: [
+          { f:"lats", p:"191,189 154,217 159,263 181,324 177,393 191,383" },
+          { f:"mid", p:"199,182 196,381 208,371 210,332 234,274 229,246" },
+          { f:"mid", p:"300,182 274,236 265,272 289,332 292,373 302,380" },
+          { f:"lats", p:"307,188 307,383 323,394 319,318 341,260 345,217" },
+        ],
+      },
+    },
+    glutes: {
+      female: {
+        back: [
+          { f:"medius", p:"181,395 245,396 243,376 238,366 228,357 218,353 202,354 189,367" },
+          { f:"overall", p:"180,401 178,433 181,442 191,453 205,458 217,457 234,450 245,440 245,401" },
+          { f:"medius", p:"256,376 254,396 318,396 310,367 302,357 294,353 281,353 271,357 261,366" },
+          { f:"overall", p:"254,401 254,440 262,448 278,456 294,458 308,453 316,445 321,432 318,401" },
+        ],
+      },
+      male: {
+        back: [
+          { f:"medius", p:"242,396 235,388 227,384 216,383 205,386 193,397 185,422 246,422" },
+          { f:"overall", p:"183,428 181,452 184,460 193,470 213,477 233,477 242,472 246,460 246,427" },
+          { f:"medius", p:"256,399 253,422 314,422 305,395 294,386 283,383 270,385 264,388" },
+          { f:"overall", p:"253,427 254,465 259,474 266,477 292,476 303,472 314,462 319,447 315,427" },
+        ],
+      },
+    },
+  };
+  /* end body-map data */
+
   /* =========================================================================
      Flat lookup: every exercise addressable as "group:key".
      ========================================================================= */
@@ -1125,6 +1546,24 @@
       ALL[`${g}:${e.key}`] = Object.assign({}, e, { group:g, groupTitle:DATA[g].title, focus });
     });
   });
+
+  // stretches addressed as "stretch:<key>"; STRETCH_BY_KEY[key] → stretch object
+  const STRETCH_BY_KEY = {};
+  STRETCHES.forEach(s => { STRETCH_BY_KEY[s.key] = s; });
+  // stretches that cover a muscle group, optionally filtered by type
+  function stretchesFor(group, type) {
+    return STRETCHES.filter(s => s.groups.includes(group) && (!type || s.type === type));
+  }
+  // one stretch per group across a routine's muscles (deduped, capped) — used for pairing
+  function stretchesForGroups(groups, type, cap) {
+    const picked = [], seen = new Set();
+    for (const g of groups) {
+      if (picked.length >= cap) break;
+      const s = STRETCHES.find(x => x.type === type && !seen.has(x.key) && x.groups.includes(g));
+      if (s) { picked.push(s.key); seen.add(s.key); }
+    }
+    return picked;
+  }
 
   const YT = "https://www.youtube.com/results?search_query=";
 
@@ -1282,10 +1721,70 @@
       </div>`;
   }
 
+  function stretchCardHTML(key) {
+    const s = STRETCH_BY_KEY[key]; if (!s) return "";
+    const sid = "stretch:" + key, saved = SAVED.has(sid);
+    const q = encodeURIComponent(s.name + " stretch how to");
+    const cues = s.cues.map(c => `<li>${esc(c)}</li>`).join("");
+    const dyn = s.type === "dynamic";
+    const targets = s.groups.map(g => DATA[g] ? DATA[g].title : g).join(", ");
+    return `
+      <div class="ex-wrap">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-name">${esc(s.name)}</div>
+            <span class="lvl ${dyn ? "warm" : "cool"}">${dyn ? "Warm-up" : "Cool-down"}</span>
+          </div>
+          <div class="card-desc">${esc(s.desc)}</div>
+          <button class="thumb" onclick="toggleVid(this)" data-yt="${s.yt}" data-q="${q}" aria-label="Play demo for ${esc(s.name)}">
+            <img loading="lazy" src="https://i.ytimg.com/vi/${s.yt}/hqdefault.jpg" alt="">
+            <span class="thumb-play"><span class="pbtn">▶</span></span>
+          </button>
+          <div class="srr"><div><b>${esc(s.hold)}</b><span>${dyn ? "reps / time" : "hold"}</span></div></div>
+          <div class="block"><div class="block-h">How to</div><ul class="cues">${cues}</ul></div>
+          <div class="pills"><span class="pill"><span class="pill-k">Targets</span> ${esc(targets)}</span></div>
+          <div class="actions">
+            <button class="save ${saved ? "on" : ""}" onclick="toggleSave(this)" data-id="${sid}">${saved ? "♥ Saved" : "♡ Save"}</button>
+          </div>
+        </div>
+        <div class="player"></div>
+      </div>`;
+  }
+
+  function stretchRowHTML(key) {
+    const s = STRETCH_BY_KEY[key]; if (!s) return "";
+    const q = encodeURIComponent(s.name + " stretch how to");
+    return `
+      <div class="rrow">
+        <div class="rrow-main">
+          <span class="rrow-name">${esc(s.name)}</span>
+          <span class="rrow-meta">${esc(s.hold)}</span>
+        </div>
+        <button class="rwatch" onclick="toggleVid(this)" data-yt="${s.yt}" data-q="${q}"
+                data-label="▶" data-close="✕">▶</button>
+        <div class="player"></div>
+      </div>`;
+  }
+
   /* ---- Exercises view ---- */
   let currentGroup = null;
   let currentFocus = "all";
+  let viewMode = "exercises"; // "exercises" | "stretches" — toggled on the Exercises tab
   const activeEquip = new Set(EQUIP); // city gym — everything on by default
+
+  function setViewMode(m) {
+    viewMode = m;
+    const stretch = m === "stretches";
+    document.querySelectorAll("#seg-mode button").forEach(b => b.classList.toggle("on", b.dataset.mode === m));
+    document.getElementById("filterbar").style.display = stretch ? "none" : "";
+    document.querySelector(".bodymap-hint").textContent = stretch
+      ? "Tap a muscle to see its warm-up & cool-down stretches."
+      : "Tap a muscle to see its exercises — or use the list below.";
+    renderBodyMap(); // sub-zones don't apply in stretch mode
+    if (currentGroup) showGroup(currentGroup);
+    else document.getElementById("ex-results").innerHTML =
+      `<div class="placeholder">Pick a muscle group above to see ${stretch ? "stretches for it" : "exercises that train it"}.</div>`;
+  }
 
   function showGroup(group, focus) {
     const sb = document.getElementById("search"); if (sb) sb.value = ""; // leaving search
@@ -1296,7 +1795,21 @@
 
     document.querySelectorAll("#muscle-nav button").forEach(b => b.classList.toggle("on", b.dataset.group === group));
     syncBodyMap(group);
+    const res = document.getElementById("ex-results");
     const d = DATA[group];
+
+    if (viewMode === "stretches") {
+      const warm = stretchesFor(group, "dynamic"), cool = stretchesFor(group, "static");
+      const total = warm.length + cool.length;
+      const head = `<div class="res-head"><h2>${esc(d.title)} stretches</h2><span class="count">${total} stretch${total !== 1 ? "es" : ""}</span></div>`;
+      const sect = (label, list) => list.length ? `<div class="section-h">${label}</div>` + list.map(s => stretchCardHTML(s.key)).join("") : "";
+      res.innerHTML = head + (total
+        ? sect("Warm-up — before", warm) + sect("Cool-down — after", cool)
+        : `<div class="empty">No stretches listed for this muscle yet.</div>`);
+      if (window.innerWidth <= 760 && focus === undefined) res.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
     const hasFocus = !!FOCUS[group];
     const ids = d.ex.map(e => `${group}:${e.key}`)
       .filter(id => ALL[id].equip.some(x => activeEquip.has(x)))
@@ -1310,9 +1823,8 @@
       ).join("") + `</div>`;
     }
 
-    const head = `<div class="res-head"><h2>${esc(d.title)}</h2><span class="count">${ids.length} exercise${ids.length !== 1 ? "s" : ""}</span></div>`;
-    const res = document.getElementById("ex-results");
-    res.innerHTML = head + focusBar + (ids.length
+    const exHead = `<div class="res-head"><h2>${esc(d.title)}</h2><span class="count">${ids.length} exercise${ids.length !== 1 ? "s" : ""}</span></div>`;
+    res.innerHTML = exHead + focusBar + (ids.length
       ? ids.map(cardHTML).join("")
       : `<div class="empty">No exercises match your filters. Try turning on more equipment${hasFocus ? " or switching focus" : ""}.</div>`);
 
@@ -1337,15 +1849,18 @@
       return hay.includes(q);
     });
     const machines = MACHINES.filter(m => (m.name + " " + m.trains).toLowerCase().includes(q));
-    const total = ids.length + machines.length;
+    const stretches = STRETCHES.filter(s =>
+      (s.name + " " + s.groups.map(g => DATA[g] ? DATA[g].title : g).join(" ")).toLowerCase().includes(q));
+    const total = ids.length + machines.length + stretches.length;
     const head = `<div class="res-head"><h2>Search</h2><span class="count">${total} result${total !== 1 ? "s" : ""} for “${esc(raw.trim())}”</span></div>`;
     if (!total) {
-      res.innerHTML = head + `<div class="empty">No matches for “${esc(raw.trim())}”. Try a muscle (“glutes”), an exercise (“romanian deadlift”), a machine (“leg press”), or equipment (“dumbbell”).</div>`;
+      res.innerHTML = head + `<div class="empty">No matches for “${esc(raw.trim())}”. Try a muscle (“glutes”), an exercise (“romanian deadlift”), a machine (“leg press”), or a stretch (“hamstring”).</div>`;
       return;
     }
     const machineSection = machines.length ? `<div class="section-h">Machines</div>` + machines.map(machineCardHTML).join("") : "";
     const exSection = ids.length ? `<div class="section-h">Exercises</div>` + ids.map(cardHTML).join("") : "";
-    res.innerHTML = head + machineSection + exSection;
+    const stSection = stretches.length ? `<div class="section-h">Stretches</div>` + stretches.map(s => stretchCardHTML(s.key)).join("") : "";
+    res.innerHTML = head + machineSection + exSection + stSection;
   }
   function eqGroup(key) { return EQUIP_GROUPS.find(g => g.key === key); }
   function groupActive(g) { return g.items.every(x => activeEquip.has(x)); }
@@ -1401,19 +1916,43 @@
     if (currentTab === "saved") renderSaved();
   }
 
+  let savedView = "all"; // "all" | "exercises" | "stretches"
+  function setSavedView(v) {
+    savedView = v;
+    document.querySelectorAll("#seg-saved button").forEach(b => b.classList.toggle("on", b.dataset.sv === v));
+    renderSaved();
+  }
   function renderSaved() {
     const wrap = document.getElementById("saved-list");
     const banner = canSave ? "" :
       `<div class="banner">Heads up — saving isn't available in private / incognito mode, so favorites won't stick after you close the tab.</div>`;
-    const ids = [...SAVED].filter(id => ALL[id]);
-    if (!ids.length) {
-      wrap.innerHTML = banner + `<div class="empty">Tap “♡ Save” on any exercise and it'll show up here.</div>`;
-      return;
+    const exIds = [...SAVED].filter(id => ALL[id]);
+    const stKeys = [...SAVED].filter(id => id.startsWith("stretch:")).map(id => id.slice(8)).filter(k => STRETCH_BY_KEY[k]);
+    let html = "";
+    if (savedView !== "stretches" && exIds.length) {
+      if (savedView === "all") html += `<div class="section-h">Exercises</div>`;
+      html += exIds.map(cardHTML).join("");
     }
-    wrap.innerHTML = banner + ids.map(cardHTML).join("");
+    if (savedView !== "exercises" && stKeys.length) {
+      if (savedView === "all") html += `<div class="section-h">Stretches</div>`;
+      html += stKeys.map(stretchCardHTML).join("");
+    }
+    if (!html) {
+      const what = savedView === "stretches" ? "stretch" : savedView === "exercises" ? "exercise" : "exercise or stretch";
+      html = `<div class="empty">Tap “♡ Save” on any ${what} and it'll show up here.</div>`;
+    }
+    wrap.innerHTML = banner + html;
   }
 
   /* ---- Routines tab (custom builder + saved customs + built-ins) ---- */
+  // auto warm-up / cool-down stretches for the muscle groups a routine's exercises hit
+  function pairing(itemIds, type, cap, label) {
+    const groups = [];
+    itemIds.forEach(id => { const e = ALL[id]; if (e && !groups.includes(e.group)) groups.push(e.group); });
+    const keys = stretchesForGroups(groups, type, cap);
+    return keys.length ? `<div class="day-h pair-h">${label}</div>` + keys.map(stretchRowHTML).join("") : "";
+  }
+
   function renderRoutinesTab() {
     renderMyRoutines();
     renderRoutines();
@@ -1459,7 +1998,9 @@
           </button>
           <div class="routine-body${editing ? " open" : ""}" id="rbody-${uid}">
             ${renameRow}
+            ${pairing(items, "dynamic", 4, "Warm-up")}
             ${rows}
+            ${pairing(items, "static", 5, "Cool-down")}
             <div class="builder-actions">
               ${actions}
             </div>
@@ -1471,6 +2012,7 @@
   function renderRoutines() {
     document.getElementById("routine-list").innerHTML = ROUTINES.map((r, i) => {
       const uid = "b" + i;
+      const allItems = r.days.reduce((a, day) => a.concat(day.items), []);
       const days = r.days.map(day => {
         const head = day.name ? `<div class="day-h">${esc(day.name)}</div>` : "";
         return head + day.items.map(rowHTML).join("");
@@ -1483,7 +2025,9 @@
           </button>
           <div class="routine-body" id="rbody-${uid}">
             <p class="routine-note">${esc(r.note)}</p>
+            ${pairing(allItems, "dynamic", 4, "Warm-up")}
             ${days}
+            ${pairing(allItems, "static", 5, "Cool-down")}
             <div class="builder-actions"><button class="btn-ghost" onclick="saveCopyOfBuiltin(${i})">♡ Save a copy to my routines</button></div>
           </div>
         </div>`;
@@ -1533,32 +2077,50 @@
   /* ---- Body map (clickable muscle picker) ---- */
   let bodyType = "female", bodyView = "front";
   function viewHasGroup(view, group) { return (HOTSPOTS[bodyType][view] || []).some(s => s.g === group); }
+  function subZonesFor(group) {
+    if (viewMode === "stretches") return null; // stretches have no focus sub-zones
+    return (group && SUBZONES[group] && SUBZONES[group][bodyType] && SUBZONES[group][bodyType][bodyView]) || null;
+  }
   function renderBodyMap() {
     const el = document.getElementById("bodymap");
     const spots = (HOTSPOTS[bodyType] && HOTSPOTS[bodyType][bodyView]) || [];
-    const polys = spots.map(s =>
-      `<polygon class="hot${currentGroup === s.g ? " sel" : ""}" data-group="${s.g}" points="${s.p}" onclick="showGroup('${s.g}')" onmouseover="hoverGroup('${s.g}')" onmouseout="hoverGroup('')"></polygon>`
-    ).join("");
-    el.innerHTML = `<img src="assets/${bodyType}-${bodyView}.png" alt="${bodyType} ${bodyView} view — tap a muscle">`
-      + `<svg viewBox="0 0 500 900" preserveAspectRatio="xMidYMid meet">${polys}</svg>`;
+    const subs = subZonesFor(currentGroup);  // sub-zones of the currently-selected muscle, if any
+    let polys = "";
+    spots.forEach(s => {
+      if (subs && s.g === currentGroup) return;  // the whole-muscle hotspot is replaced by its sub-zones
+      polys += `<polygon class="hot${currentGroup === s.g ? " sel" : ""}" data-group="${s.g}" points="${s.p}" onclick="showGroup('${s.g}')" onmouseover="hoverGroup('${s.g}')" onmouseout="hoverGroup('')"></polygon>`;
+    });
+    if (subs) {
+      subs.forEach(z => {
+        const active = currentFocus === "all" || currentFocus === z.f;  // whole muscle, or the chosen section
+        polys += `<polygon class="hot sub${active ? " sel" : ""}" data-group="${currentGroup}" data-focus="${z.f}" points="${z.p}" onclick="showGroup('${currentGroup}','${z.f}')" onmouseover="hoverSub('${z.f}')" onmouseout="hoverGroup('')"></polygon>`;
+      });
+    }
+    const src = `assets/${bodyType}-${bodyView}.png`;
+    const img = el.querySelector("img"), svg = el.querySelector("svg");
+    if (img && svg && img.getAttribute("src") === src) {
+      svg.innerHTML = polys;  // same image — just update the overlay (no flicker)
+    } else {
+      el.innerHTML = `<img src="${src}" alt="${bodyType} ${bodyView} view — tap a muscle">`
+        + `<svg viewBox="0 0 500 900" preserveAspectRatio="xMidYMid meet">${polys}</svg>`;
+    }
     document.querySelectorAll("#seg-body button").forEach(b => b.classList.toggle("on", b.dataset.body === bodyType));
     document.querySelectorAll("#seg-view button").forEach(b => b.classList.toggle("on", b.dataset.view === bodyView));
   }
-  // hover any muscle → highlight every polygon in that group (both sides). Empty clears.
+  // hover a muscle → highlight every polygon in that group (both sides); hover a sub-zone → its focus.
   function hoverGroup(g) {
-    document.querySelectorAll("#bodymap .hot").forEach(h => h.classList.toggle("hov", !!g && h.dataset.group === g));
+    document.querySelectorAll("#bodymap .hot").forEach(h => h.classList.toggle("hov", !!g && h.dataset.group === g && !h.dataset.focus));
+  }
+  function hoverSub(f) {
+    document.querySelectorAll("#bodymap .hot.sub").forEach(h => h.classList.toggle("hov", !!f && h.dataset.focus === f));
   }
   function setBodyType(t) { bodyType = t; renderBodyMap(); }
   function setBodyView(v) { bodyView = v; renderBodyMap(); }
   // keep the map in sync when a group is selected from anywhere (hotspot, chip, search, machine)
   function syncBodyMap(group) {
     const other = bodyView === "front" ? "back" : "front";
-    if (group && !viewHasGroup(bodyView, group) && viewHasGroup(other, group)) {
-      bodyView = other;
-      renderBodyMap(); // rebuild applies the .sel highlight from currentGroup
-    } else {
-      document.querySelectorAll("#bodymap .hot").forEach(h => h.classList.toggle("sel", h.dataset.group === group));
-    }
+    if (group && !viewHasGroup(bodyView, group) && viewHasGroup(other, group)) bodyView = other;
+    renderBodyMap();  // re-render so a splittable muscle shows/refreshes its sub-zones
   }
 
   /* ---- Tabs ---- */

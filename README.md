@@ -57,7 +57,7 @@ It's a static file, so any of these work:
 > `.claude/launch.json` is configured to serve the folder for the Claude Code
 > preview tool. Harmless to keep or delete.
 
-> **Custom domain note:** an earlier attempt to point `www.hannahsworkout.com` at
+> **Custom domain note:** an earlier attempt to point a custom domain at
 > GitHub Pages failed only because **the domain is not registered yet** (it has no
 > DNS records). Buy the domain first, then add a `CNAME` DNS record
 > (`www` → `<user>.github.io`) and a `CNAME` file in the repo containing the domain.
@@ -77,7 +77,7 @@ The app is five tabs, switched from a fixed bottom nav bar:
    - **Body map** at the top — a clickable anatomical figure with **Female/Male** and
      **Front/Back** toggles. Tap a muscle to see its exercises; the map highlights the
      selection and auto-flips front/back to follow whatever you pick (even from the
-     chips or search). It's the visual entry point Hannah wanted. Muscles that have
+     chips or search). It's the visual entry point. Muscles that have
      sub-sections (**glutes** → upper/overall, **abs** → upper/lower/obliques, **back**
      → lats/mid) split into tappable zones once selected, so you can drill into a
      section right on the figure (mirrors the focus chips). The ab obliques are
@@ -123,8 +123,7 @@ description, a **video thumbnail** (the YouTube poster image — tap it to expan
 inline player; tap again to close), a **sets · reps · rest** row, **form cues**,
 **common mistakes**, a **gear** pill, a **secondary muscles** pill, a **♡ Save**
 button, and a **＋ Routine** button (opens the add-to-routine popup). (The thumbnail
-is the play control — Hannah is a visual learner, so cards lead with the image
-rather than a text button.)
+is the play control — cards lead with the image rather than a text button.)
 
 ### Covered muscle groups (13) / exercises (66)
 chest, back, shoulders, biceps, triceps, traps, forearms (upper); abs, lower back
@@ -295,9 +294,9 @@ list of `"group:key"` item strings that must exist in `DATA`).
 
 ---
 
-## Roadmap (planned with Hannah)
+## Roadmap
 All four planned phases are built. Smaller ideas still open: workout-of-the-day /
-randomized session; mark-as-done session logging; personalize (her name in the title).
+randomized session; mark-as-done session logging.
 
 ### Done
 - **Stretching:** a Stretches mode on the Exercises tab (warm-up/cool-down stretches

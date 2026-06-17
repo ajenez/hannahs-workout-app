@@ -282,7 +282,14 @@
   }
   .log-save:active { transform: scale(0.97); }
   .log-confirm { font-size: 0.8rem; color: var(--good); text-align: center; margin-top: 8px; display: none; }
-  .log-confirm.show { display: block; }
+  .log-confirm.show { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .rest-start-btn {
+    font-family: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    background: transparent; border: 1px solid var(--good); color: var(--good);
+    padding: 3px 10px; border-radius: 999px;
+  }
+  .rest-start-btn:active { opacity: 0.7; }
+  .rest-elapsed { color: var(--text-dim); font-weight: 400; }
 
   /* ---- Progress tab ---- */
   .prog-empty { color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; text-align: center; padding: 40px 16px; }
@@ -1866,6 +1873,32 @@
       panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }
+  function _parseRestSecs(restStr) {
+    if (!restStr) return 60;
+    const min = restStr.match(/(\d+)\s*min/i);
+    if (min) return parseInt(min[1]) * 60;
+    const sec = restStr.match(/(\d+)\s*s/i);
+    return sec ? parseInt(sec[1]) : 60;
+  }
+  let _restTimerId = null;
+  function _startRestTimer(btn, restSecs) {
+    clearInterval(_restTimerId);
+    const conf = btn.closest(".log-confirm");
+    const start = Date.now();
+    btn.remove();
+    const update = () => {
+      const elapsed = Math.floor((Date.now() - start) / 1000);
+      const m = Math.floor(elapsed / 60), s = elapsed % 60;
+      const t = m > 0 ? `${m}:${String(s).padStart(2,"0")}` : `${s}s`;
+      if (elapsed >= restSecs) {
+        conf.innerHTML = `Ready when you are! <span class="rest-elapsed">(${t})</span>`;
+      } else {
+        conf.textContent = `Resting: ${t}`;
+      }
+    };
+    update();
+    _restTimerId = setInterval(update, 1000);
+  }
   function saveLog(exId, saveBtn) {
     const e = ALL[exId]; if (!e) return;
     const sid = exId.replace(/[^a-z0-9]/g, "-");
@@ -1877,7 +1910,12 @@
     LOGS.push({ id: Date.now().toString(36), exId, date: new Date().toISOString(), weight, reps, sets, unit: UNIT });
     persistLogs();
     const conf = document.getElementById("lp-conf-" + sid);
-    if (conf) { conf.classList.add("show"); setTimeout(() => conf.classList.remove("show"), 1500); }
+    if (conf) {
+      clearInterval(_restTimerId);
+      const restSecs = _parseRestSecs(e.rest);
+      conf.innerHTML = `Logged! <button class="rest-start-btn" onclick="_startRestTimer(this,${restSecs})">Start rest timer</button>`;
+      conf.classList.add("show");
+    }
     const last = lastLog(exId);
     const val = mode === "time" ? `${last.reps}s × ${last.sets} sets`
               : mode === "bw"   ? `${last.reps} reps × ${last.sets} sets`

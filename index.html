@@ -322,6 +322,22 @@
     font-size: 0.85rem; padding: 0 0 0 10px; line-height: 1; flex-shrink: 0;
   }
   .prog-entry-del:active { color: var(--accent); }
+  .prog-stats {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 20px;
+  }
+  .prog-stats-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); margin-bottom: 6px; }
+  .prog-dots { display: flex; gap: 7px; align-items: center; }
+  .prog-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--line);
+  }
+  .prog-dot.active { background: var(--good); }
+  .prog-dot.today { outline: 2px solid var(--good); outline-offset: 2px; }
+  .prog-streak { text-align: right; }
+  .prog-streak-num { font-size: 1.6rem; font-weight: 800; color: var(--good); line-height: 1; }
+  .prog-streak-sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 3px; }
 
   /* ---- Generate tab ---- */
   .wod-splits { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
@@ -631,6 +647,7 @@
     <section id="view-progress" class="view">
       <h2 class="view-title">Progress</h2>
       <p class="view-sub">Track your progress and celebrate how far you've come.</p>
+      <div id="progress-stats"></div>
       <div id="progress-list"></div>
     </section>
 
@@ -1957,7 +1974,37 @@
     renderProgress();
     _showUndoBanner(false);
   }
+  function renderProgressStats() {
+    const statsEl = document.getElementById("progress-stats");
+    if (!statsEl) return;
+    if (!LOGS.length) { statsEl.innerHTML = ""; return; }
+    // build a set of date strings (YYYY-MM-DD) that have log entries
+    const loggedDays = new Set(LOGS.map(l => l.date.slice(0, 10)));
+    // last 7 days ending today
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      days.push(d.toISOString().slice(0, 10));
+    }
+    const activeDays = days.filter(d => loggedDays.has(d)).length;
+    const dots = days.map((d, i) => {
+      const active = loggedDays.has(d);
+      const isToday = i === 6;
+      return `<div class="prog-dot${active ? " active" : ""}${isToday ? " today" : ""}" title="${d}"></div>`;
+    }).join("");
+    statsEl.innerHTML = `<div class="prog-stats">
+      <div>
+        <div class="prog-stats-label">Last 7 days</div>
+        <div class="prog-dots">${dots}</div>
+      </div>
+      <div class="prog-streak">
+        <div class="prog-streak-num">${activeDays}</div>
+        <div class="prog-streak-sub">day${activeDays !== 1 ? "s" : ""} active</div>
+      </div>
+    </div>`;
+  }
   function renderProgress() {
+    renderProgressStats();
     const wrap = document.getElementById("progress-list");
     if (!LOGS.length) {
       wrap.innerHTML = `<div class="prog-empty">No workouts logged yet.<br>Tap <strong>✎ Log</strong> on any exercise card to record your sets.</div>`;

@@ -494,6 +494,18 @@
     font-size: 0.84rem; line-height: 1.45; margin-bottom: 14px;
   }
 
+  /* ---- Undo toast ---- */
+  .undo-banner {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #1e2d3a; border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 14px; font-size: 0.84rem; color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+  .undo-banner-btn {
+    font-family: inherit; background: none; border: none; cursor: pointer;
+    color: var(--good); font-weight: 700; font-size: 0.84rem; padding: 0;
+  }
+
   /* ---- Bottom tab bar ---- */
   .tabbar {
     position: fixed; bottom: 0; left: 0; right: 0;
@@ -611,7 +623,7 @@
     <!-- PROGRESS -->
     <section id="view-progress" class="view">
       <h2 class="view-title">Progress</h2>
-      <p class="view-sub">Your logged workouts, so you always know what to beat.</p>
+      <p class="view-sub">Track your progress and celebrate how far you've come.</p>
       <div id="progress-list"></div>
     </section>
 
@@ -1875,12 +1887,37 @@
     });
     if (currentTab === "progress") renderProgress();
   }
+  let _undoEntry = null, _undoIdx = null, _undoTimer = null;
+  function _showUndoBanner(visible) {
+    const wrap = document.getElementById("progress-list");
+    const existing = wrap.querySelector(".undo-banner");
+    if (!visible) { if (existing) existing.remove(); return; }
+    if (existing) return;
+    const banner = document.createElement("div");
+    banner.className = "undo-banner";
+    banner.innerHTML = `<span>Entry removed</span><button class="undo-banner-btn" onclick="undoDelete()">Undo</button>`;
+    wrap.prepend(banner);
+  }
   function deleteLog(id) {
     const idx = LOGS.findIndex(l => l.id === id);
     if (idx === -1) return;
+    _undoEntry = LOGS[idx];
+    _undoIdx = idx;
     LOGS.splice(idx, 1);
     persistLogs();
     renderProgress();
+    clearTimeout(_undoTimer);
+    _showUndoBanner(true);
+    _undoTimer = setTimeout(() => { _showUndoBanner(false); _undoEntry = null; }, 5000);
+  }
+  function undoDelete() {
+    if (!_undoEntry) return;
+    clearTimeout(_undoTimer);
+    LOGS.splice(_undoIdx, 0, _undoEntry);
+    _undoEntry = null; _undoIdx = null;
+    persistLogs();
+    renderProgress();
+    _showUndoBanner(false);
   }
   function renderProgress() {
     const wrap = document.getElementById("progress-list");
